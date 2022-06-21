@@ -6,28 +6,41 @@ import { fetchUserMovies, submitMovies } from "../actions/movieActions";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const FiveMovies = () => {
+	const Movie = {
+		id: -1,
+		title: "",
+		poster_path: "",
+		release_date: "",
+		overview: "",
+	};
+	// const [movies, setMovies] = useState(new Array(5).fill(Movie));
+
 	const dispatch = useDispatch();
 	const moviesState = useSelector((state) => state.selectMovieReducer);
-	// const [movies, setMovies] = useState([]);
+
 	let movies = moviesState.movies;
+
 	const [hasSubmitted, setHasSubmitted] = useState(false);
 	const userMoviesState = useSelector((state) => state.fetchUserMoviesReducer);
 
-	const { user } = useAuth0();
-	useEffect(() => {
-		dispatch(fetchUserMovies(user));
-		const userMovies = userMoviesState.movies;
-		if (userMovies.length > 0) {
-			console.log("this");
-			setHasSubmitted(true);
-			// movies = [...userMovies];
-			console.log("movies", movies);
-		}
-	}, []);
-	if (hasSubmitted) {
-		const userMovies = userMoviesState.movies;
-		movies = [...userMovies];
-	}
+	const { isLoading, user, isAuthenticated } = useAuth0();
+
+	// const [change, setChange] = useState(true);
+
+	// const handleUserMovies = () => {
+	// 	dispatch(fetchUserMovies());
+	// 	const userMovies = userMoviesState.movies;
+	// 	if (userMovies && userMovies.length > 0) {
+	// 		setHasSubmitted(true);
+	// 		setMovies([...userMovies]);
+	// 		setChange(!change);
+	// 		console.log("movies", movies);
+	// 	}
+	// };
+
+	// useEffect(() => {
+	// 	handleUserMovies();
+	// }, [user, isAuthenticated, isLoading, dispatch]);
 	const isValid = () => {
 		let count = 0;
 		movies.forEach((movie) => {
@@ -48,49 +61,54 @@ const FiveMovies = () => {
 	return (
 		<>
 			{hasSubmitted && <h1>Thank you for submitting...</h1>}
-			<div
-				style={{
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "center",
-					marginTop: "50px",
-				}}
-			>
-				<MovieCardInput movie={movies[0]} order="1st" />
-			</div>
-			<div
-				style={{
-					display: "flex",
-					flexWrap: "wrap",
-					justifyContent: "space-evenly",
-					alignItems: "center",
-					marginTop: "4rem",
-				}}
-			>
-				<MovieCardInput movie={movies[1]} order="2nd" />
-				<MovieCardInput movie={movies[2]} order="3rd" />
-			</div>
-			<div
-				style={{
-					display: "flex",
-					flexWrap: "wrap",
-					width: "100%",
-					justifyContent: "space-around",
-					alignItems: "center",
-					marginTop: "4rem",
-				}}
-			>
-				<MovieCardInput movie={movies[3]} order="4th" />
-				<MovieCardInput movie={movies[4]} order="5th" />
-			</div>
-			<Button
-				variant="contained"
-				color="primary"
-				disabled={!isValid()}
-				onClick={submitMoviesHandler}
-			>
-				Submit
-			</Button>
+			{isLoading && <h1>Loading...</h1>}
+			{!isLoading && (
+				<>
+					<div
+						style={{
+							display: "flex",
+							justifyContent: "center",
+							alignItems: "center",
+							marginTop: "50px",
+						}}
+					>
+						<MovieCardInput movie={movies && movies[0]} order="1st" />
+					</div>
+					<div
+						style={{
+							display: "flex",
+							flexWrap: "wrap",
+							justifyContent: "space-evenly",
+							alignItems: "center",
+							marginTop: "4rem",
+						}}
+					>
+						<MovieCardInput movie={movies && movies[1]} order="2nd" />
+						<MovieCardInput movie={movies && movies[2]} order="3rd" />
+					</div>
+					<div
+						style={{
+							display: "flex",
+							flexWrap: "wrap",
+							width: "100%",
+							justifyContent: "space-around",
+							alignItems: "center",
+							marginTop: "4rem",
+						}}
+					>
+						<MovieCardInput movie={movies && movies[3]} order="4th" />
+						<MovieCardInput movie={movies && movies[4]} order="5th" />
+					</div>
+					<Button
+						variant="contained"
+						color="primary"
+						disabled={!isValid()}
+						onClick={submitMoviesHandler}
+					>
+						Submit
+					</Button>
+				</>
+			)}
 		</>
 	);
 };

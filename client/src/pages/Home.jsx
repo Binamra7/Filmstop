@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import FiveMoviesHome from "../components/FiveMoviesHome";
 import { useDispatch, useSelector } from "react-redux";
 import { getMovies } from "../actions/movieActions";
+
 const Home = () => {
 	const dispatch = useDispatch();
 	const moviesState = useSelector((state) => state.getMoviesReducer);
