@@ -1,9 +1,11 @@
 import axios from "axios";
 
+const herokuAPI = "https://filmstop.herokuapp.com/";
+
 export const getMovies = () => (dispatch) => {
 	dispatch({ type: "FETCH_MOVIES_REQUEST" });
 	axios
-		.get("http://localhost:5000/api/movies")
+		.get("https://filmstop.herokuapp.com/api/movies")
 		.then((res) => {
 			dispatch({ type: "FETCH_MOVIES_SUCCESS", payload: res.data });
 		})
@@ -51,7 +53,7 @@ export const submitMovies =
 
 		dispatch({ type: "SUBMIT_MOVIES_REQUEST" });
 		axios
-			.post("http://localhost:5000/api/movies/user/add", {
+			.post("https://filmstop.herokuapp.com/api/movies/user/add", {
 				formattedMovies,
 				user,
 			})
@@ -62,7 +64,7 @@ export const submitMovies =
 				dispatch({ type: "SUBMIT_MOVIES_FAILURE", payload: err });
 			});
 		axios
-			.post("http://localhost:5000/api/movies/rank/add", {
+			.post("https://filmstop.herokuapp.com/api/movies/rank/add", {
 				formattedMovies,
 				user,
 			})
@@ -77,7 +79,7 @@ export const submitMovies =
 export const fetchUserMovies = (user) => (dispatch) => {
 	dispatch({ type: "FETCH_USER_MOVIES_REQUEST" });
 	axios
-		.post("http://localhost:5000/api/movies/user", { user })
+		.post("https://filmstop.herokuapp.com/api/movies/user", { user })
 		.then((res) => {
 			dispatch({ type: "FETCH_USER_MOVIES_SUCCESS", payload: res.data });
 		})
