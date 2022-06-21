@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 //use CORS middleware
 app.use(cors());
+
 //use dotenv
 dotenv.config();
 
