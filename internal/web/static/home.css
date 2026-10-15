@@ -1,0 +1,57 @@
+/* Home: linked titles and the programme notes. Inlined after site.css. */
+
+/* Titles link to their film, but still read as titles until you point at them. */
+.pn-title-link { text-decoration: none; }
+.pn-title-link:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.12em; }
+/* A scene or credit line is one target: the title's link covers the whole item. */
+.scene, .roll li { position: relative; }
+.pn-stretch::after { content: ""; position: absolute; inset: 0; z-index: 2; }
+.scene:hover .film-title a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.12em; }
+.roll li:hover .roll-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
+.pn-stretch:focus-visible { outline: none; }
+.pn-stretch:focus-visible::after { outline: 2px solid var(--text); outline-offset: 6px; border-radius: var(--radius); }
+
+/* Programme notes: printed like the notes in a cinema programme, a heading in
+   the title-card voice and the note set in sentences beside it. */
+.pn { padding-bottom: 96px; }
+.pn-body { display: grid; gap: 56px; }
+@media (min-width: 980px) {
+  .pn-body { grid-template-columns: minmax(0, 1fr) 340px; column-gap: 72px; align-items: start; }
+  .pn-only-latest { grid-template-columns: minmax(0, 720px); }
+}
+
+.pn-notes { display: grid; }
+.pn-note { display: grid; gap: 6px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+.pn-note:first-child { padding-top: 4px; }
+.pn-note:last-child { border-bottom: 0; }
+@media (min-width: 700px) {
+  .pn-note { grid-template-columns: 210px minmax(0, 1fr); column-gap: 32px; align-items: baseline; }
+}
+.pn-head {
+  font-family: var(--serif); font-variation-settings: var(--serif-cut);
+  font-size: 22px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em;
+}
+.pn-text { font-size: 18px; line-height: 1.6; max-width: 62ch; color: var(--text-2); text-wrap: pretty; }
+
+/* A film named in a sentence is set as a title, and links to its page. */
+.pn-film {
+  font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 600;
+  font-size: 1.06em; color: var(--text); text-decoration: underline;
+  text-decoration-color: var(--line-strong); text-decoration-thickness: 1px; text-underline-offset: 0.2em;
+  transition: text-decoration-color 150ms;
+}
+.pn-film:hover { text-decoration-color: currentColor; }
+
+/* Just counted: a quiet column of the newest ballots. */
+.pn-latest { padding-top: 4px; }
+.pn-latest-head { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+.pn-arrivals li { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.pn-arrivals li:last-child { border-bottom: 0; }
+.pn-arrivals p:first-child { font-size: 17px; line-height: 1.45; color: var(--text-2); }
+.pn-when { margin-top: 2px; font-size: 14px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.pn-invite { margin-top: 14px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 16px; color: var(--text-2); }
+.pn-invite a { color: var(--text); font-weight: 600; text-decoration: underline; text-decoration-color: var(--line-strong); }
+.pn-invite a:hover { text-decoration-color: currentColor; }
+@media (min-width: 980px) {
+  .pn-latest { position: sticky; top: 24px; }
+}

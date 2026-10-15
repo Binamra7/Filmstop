@@ -1,0 +1,30 @@
+{{define "content"}}
+<article class="wrap prose">
+  <h1 class="film-title">How the list is counted</h1>
+  <p class="lede">Every ballot is five films in order. Filmstop turns {{if .Voters}}{{num .Voters}} of them{{else}}them{{end}} into one list with a points count that rewards both how many people love a film and how much.</p>
+
+  <h2>The rule</h2>
+  <p>A film earns points from every ballot it appears on:</p>
+  <table class="points">
+    <thead><tr><th scope="col">Place on a ballot</th><th scope="col" class="c-n">Points</th></tr></thead>
+    <tbody>
+      <tr><td>1st</td><td class="c-n">5</td></tr>
+      <tr><td>2nd</td><td class="c-n">4</td></tr>
+      <tr><td>3rd</td><td class="c-n">3</td></tr>
+      <tr><td>4th</td><td class="c-n">2</td></tr>
+      <tr><td>5th</td><td class="c-n">1</td></tr>
+    </tbody>
+  </table>
+  <p>Add them up and sort. Ties go to the film more people ranked first, then to the film on more ballots. Casting again replaces your old ballot rather than adding to it, so each person counts once.</p>
+
+  <h2>Why not something cleverer</h2>
+  <p>We tried the obvious statistical candidates before settling on points.</p>
+  <p><strong>Plackett–Luce</strong> is the standard model for ranked choices: it reads a ballot as a series of picks, best first, from every film there is. It's elegant and it's what a machine-learning answer would reach for. But with five picks out of hundreds of thousands of films, almost all of what it learns is whether a film made your five at all. In our test (1,000 simulated voters, 500 films), a film ranked first on 100 ballots came out only 9% stronger than a film ranked fifth on 100 ballots. Filmstop's whole idea is that your order matters, so a model that mostly ignores it is the wrong model.</p>
+  <p><strong>Condorcet methods</strong> such as Schulze run into the same wall: when two films are never on the same ballot, all they can compare is how often each was listed.</p>
+  <p><strong>Average place</strong> rewards a film one person ranked first over a film a hundred people ranked second. It needs a fudge factor to stop that, and the fudge factor ends up deciding the list.</p>
+  <p>Points make the trade-off explicit: one first place is worth five fifth places. You can check the arithmetic yourself from the numbers on the list.</p>
+
+  <h2>What we keep</h2>
+  <p>One anonymous cookie identifies your ballot so you can change it. We don't ask for an email, a name or a password. Film details come from TMDB.</p>
+</article>
+{{end}}

@@ -1,0 +1,59 @@
+/* Your five: the shareable programme card (/five/:code). */
+.f5-opening .opening-still { max-height: 74vh; }
+@media (min-width: 860px) { .f5-opening .opening-still { aspect-ratio: 2.39 / 1; } }
+
+.f5-name { font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 600; color: var(--text); font-size: 1.04em; }
+
+/* The billing line and the actions */
+.f5-bill { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 48px; padding-top: 28px; padding-bottom: 56px; }
+.f5-billing { max-width: 60ch; font-size: 19px; line-height: 1.5; color: var(--text-2); }
+.f5-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+.f5-quiet { border-color: var(--line-strong); color: var(--text); }
+.f5-quiet:hover { background: var(--hover); border-color: var(--text-2); }
+.f5-copied { flex-basis: 100%; min-height: 0; font-size: 15px; color: var(--text-2); }
+.f5-copied:empty { display: none; }
+.f5-url {
+  flex-basis: 100%; height: 48px; padding: 0 14px; font: inherit; font-size: 16px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius);
+}
+@media (max-width: 599px) {
+  .f5-actions { width: 100%; }
+  .f5-actions .btn { flex: 1 1 0; }
+}
+
+/* Scenes two to five, as a strip */
+.f5-strip-wrap { padding-bottom: 88px; }
+.f5-strip { display: grid; gap: 40px 24px; }
+@media (min-width: 600px) { .f5-strip { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1100px) { .f5-strip { grid-template-columns: repeat(4, 1fr); } }
+.f5-still img { transition: transform 500ms cubic-bezier(.2, .6, .2, 1); }
+@media (prefers-reduced-motion: no-preference) { .f5-scene:hover .f5-still img { transform: scale(1.03); } }
+.f5-num {
+  position: absolute; left: 14px; bottom: 2px; z-index: 1;
+  font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 500; line-height: 1;
+  font-size: clamp(56px, 4vw + 24px, 84px);
+}
+.f5-text .film-title { margin-top: 16px; font-size: clamp(24px, 1rem + 0.8vw, 30px); }
+.f5-text .credit { margin-top: 6px; }
+.f5-place { margin-top: 8px; font-size: 15px; color: var(--text-2); }
+@media (max-width: 599px) {
+  .f5-strip { gap: 18px; }
+  .f5-scene { display: grid; grid-template-columns: 136px minmax(0, 1fr); gap: 14px; align-items: center; }
+  .f5-num { left: 9px; font-size: 44px; }
+  .f5-text .film-title { margin-top: 0; font-size: 21px; }
+  .f5-text .credit { margin-top: 2px; font-size: 15px; }
+  .f5-place { margin-top: 2px; }
+}
+
+/* The reading */
+.f5-reading { display: grid; gap: 24px 64px; padding-top: 40px; padding-bottom: 104px; border-top: 1px solid var(--line); }
+.f5-reading-head .section-title { font-size: 20px; font-family: var(--sans); font-variation-settings: normal; font-weight: 600; letter-spacing: 0; color: var(--text-2); }
+.f5-headline { margin-top: 12px; font-size: clamp(36px, 1.2rem + 2.6vw, 60px); max-width: 14ch; }
+.f5-prose { display: grid; gap: 18px; max-width: 62ch; font-size: 19px; line-height: 1.6; }
+.f5-prose p:first-child { font-size: 22px; line-height: 1.5; }
+.f5-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 18px; }
+.f5-link { color: var(--text-2); font-size: 16px; font-weight: 500; }
+.f5-link:hover { color: var(--text); }
+@media (min-width: 980px) {
+  .f5-reading { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); padding-top: 56px; }
+}

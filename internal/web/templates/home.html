@@ -1,0 +1,123 @@
+{{define "content"}}
+{{$b := .Board}}
+{{if $b.Entries}}
+{{$top := $b.Top}}{{$one := index $top 0}}
+<section class="opening" aria-labelledby="one-title">
+  <div class="opening-still">
+    {{with $one.BackdropPath}}
+    <img src="{{poster . "w1280"}}" srcset="{{poster . "w780"}} 780w, {{poster . "w1280"}} 1280w, {{poster . "original"}} 1920w" sizes="100vw" width="1280" height="720" alt="" fetchpriority="high" decoding="async">
+    {{else}}{{with $one.PosterPath}}<img class="from-poster" src="{{poster . "w780"}}" width="780" height="1170" alt="" fetchpriority="high" decoding="async">{{end}}{{end}}
+  </div>
+  <div class="title-card">
+    <p class="kicker">Number one, as voted by {{num $b.Voters}} {{plural $b.Voters "person" "people"}}</p>
+    <h1 id="one-title" class="film-title"><a class="pn-title-link" href="/film/{{$one.MovieID}}">{{$one.Title}}</a></h1>
+    <p class="credit">{{template "credit" $one.Movie}}</p>
+    {{if $one.Tagline}}<p class="tagline">“{{$one.Tagline}}”</p>{{else if $one.Overview}}<p class="logline">{{$one.Overview}}</p>{{end}}
+  </div>
+</section>
+
+<section class="wrap verdict" aria-label="How voters ranked it">
+  <div class="verdict-stat">
+    <p><strong>{{num $one.Points}}</strong> points</p>
+    <p class="muted">On {{num $one.Ballots}} {{plural $one.Ballots "ballot" "ballots"}}, and first on {{num $one.Firsts}} of them</p>
+  </div>
+  <div class="spread" role="img" aria-label="Where voters placed it: {{range $i, $n := $one.ByPos}}{{if $i}}, {{end}}{{$n}} at number {{add $i 1}}{{end}}">
+    {{range spread $one.ByPos}}
+    <div class="spread-col">
+      <span class="spread-bar"><span style="height: {{.Pct}}%"></span></span>
+      <span class="spread-label">#{{.Pos}} <b>{{.N}}</b></span>
+    </div>
+    {{end}}
+  </div>
+  <div class="verdict-actions">
+    <a class="btn btn-primary" href="/ballot">{{if .Cast}}Change your five{{else}}Pick your five{{end}}</a>
+  </div>
+</section>
+
+{{if gt (len $top) 1}}
+<section class="wrap scenes" aria-labelledby="scenes-head">
+  <div class="section-head">
+    <h2 id="scenes-head" class="section-title">Two to five</h2>
+    <p class="muted">Counted from {{num $b.Voters}} {{plural $b.Voters "ballot" "ballots"}} · updated {{ago $b.At}}</p>
+  </div>
+  <ol class="scene-grid">
+    {{range $i, $e := $top}}{{if $i}}
+    <li class="scene">
+      <div class="scene-still">
+        {{with .BackdropPath}}<img src="{{poster . "w780"}}" srcset="{{poster . "w300"}} 300w, {{poster . "w780"}} 780w" sizes="(min-width: 860px) 46vw, 100vw" width="780" height="439" alt="" loading="lazy" decoding="async">
+        {{else}}{{with $e.PosterPath}}<img class="from-poster" src="{{poster . "w500"}}" width="500" height="750" alt="" loading="lazy" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}
+        <span class="scene-num" aria-hidden="true">{{.Place}}</span>
+      </div>
+      <h3 class="film-title"><a class="pn-title-link pn-stretch" href="/film/{{.MovieID}}"><span class="visually-hidden">Number {{.Place}}: </span>{{.Title}}</a></h3>
+      <p class="credit">{{template "credit" .Movie}}</p>
+      {{if .Tagline}}<p class="tagline small-tagline">“{{.Tagline}}”</p>{{end}}
+      <p class="scene-points"><strong>{{num .Points}}</strong> points · {{num .Ballots}} {{plural .Ballots "ballot" "ballots"}}{{if .Firsts}}, first on {{num .Firsts}}{{end}}</p>
+    </li>
+    {{end}}{{end}}
+  </ol>
+</section>
+{{end}}
+
+{{if or $b.Notes $b.Latest}}
+<section class="wrap pn" aria-labelledby="pn-head">
+  <div class="section-head">
+    {{if $b.Notes}}
+    <h2 id="pn-head" class="section-title">Programme notes</h2>
+    <p class="muted">What {{num $b.Voters}} {{plural $b.Voters "ballot says" "ballots say"}} about the list</p>
+    {{else}}
+    <h2 id="pn-head" class="section-title">Just counted</h2>
+    <p class="muted">The newest ballots, as they come in</p>
+    {{end}}
+  </div>
+  <div class="pn-body{{if not $b.Notes}} pn-only-latest{{end}}">
+    {{with $b.Notes}}
+    <ol class="pn-notes">
+      {{range .}}
+      <li class="pn-note">
+        <h3 class="pn-head">{{.Head}}</h3>
+        <p class="pn-text">{{template "pn-phrases" .Body}}</p>
+      </li>
+      {{end}}
+    </ol>
+    {{end}}
+    {{with $b.Latest}}
+    <div class="pn-latest">
+      {{if $b.Notes}}<h3 class="pn-latest-head">Just counted</h3>{{end}}
+      <ol class="pn-arrivals">
+        {{range .}}
+        <li><p>{{template "pn-phrases" .Body}}</p><p class="pn-when"><time datetime="{{.At.UTC.Format "2006-01-02T15:04:05Z"}}">{{ago .At}}</time></p></li>
+        {{end}}
+      </ol>
+      <p class="pn-invite">{{if $.Cast}}Yours is in there somewhere. <a href="/ballot">Change your five</a>{{else}}Yours could be next. <a href="/ballot">Pick your five</a>{{end}}</p>
+    </div>
+    {{end}}
+  </div>
+</section>
+{{end}}
+
+{{with $b.Rest}}
+<section class="credits" aria-labelledby="credits-head">
+  <h2 id="credits-head" class="section-title">Also starring</h2>
+  <p class="muted credits-sub">Places six to {{add 5 (len .)}}, in order of appearance</p>
+  <ol class="roll">
+    {{range .}}
+    <li>
+      <span class="roll-left"><span class="roll-place">No. {{.Place}}</span><span class="roll-pts">{{num .Points}} pts</span></span>
+      <span class="roll-right"><a class="roll-title pn-title-link pn-stretch" href="/film/{{.MovieID}}">{{.Title}}</a><span class="roll-credit">{{template "credit" .Movie}}</span></span>
+    </li>
+    {{end}}
+  </ol>
+</section>
+{{end}}
+
+{{else}}
+<section class="wrap empty">
+  <p class="kicker">Fade in</p>
+  <h1 class="film-title">No ballots yet</h1>
+  <p class="logline">Filmstop ranks the films people love most. The screen is still dark. Pick your five favourites, in order, and yours will be the first scene anyone sees.</p>
+  <a class="btn btn-primary" href="/ballot">Pick your five</a>
+</section>
+{{end}}
+{{end}}
+
+{{define "pn-phrases"}}{{range .}}{{if .MovieID}}<a class="pn-film" href="/film/{{.MovieID}}">{{.Text}}</a>{{else}}{{.Text}}{{end}}{{end}}{{end}}

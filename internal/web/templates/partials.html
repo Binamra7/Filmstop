@@ -1,0 +1,108 @@
+{{define "ballot-response"}}
+{{template "ballot-panel" .Ballot}}
+{{with .Results}}{{template "results" .}}{{end}}
+{{end}}
+
+{{define "ballot-panel"}}
+<div id="ballot" class="board">
+  {{if .Done}}
+  <div class="done" role="status">
+    <svg class="done-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+    <div>
+      <p class="done-head">That’s a wrap. Your five are counted.</p>
+      <p>Change your mind any time: recut the scenes and count them again.</p>
+    </div>
+    <div class="bl-done-actions">
+      <a class="btn btn-primary" href="/five">See your five as a card</a>
+      <a class="bl-text-link" href="/">See the whole list</a>
+    </div>
+  </div>
+  {{end}}
+  <div class="board-head">
+    <h2>Your storyboard</h2>
+    <span class="count">{{.Filled}} of 5</span>
+  </div>
+  <ol class="scenes-list">
+    {{range .Slots}}{{$pos := .Pos}}{{$note := .Note}}
+    {{with .Movie}}
+    <li class="shot">
+      <div class="shot-frame">
+        {{with .BackdropPath}}<img src="{{poster . "w300"}}" width="300" height="169" alt="" decoding="async">
+        {{else}}{{if .PosterPath}}<img src="{{poster .PosterPath "w185"}}" width="185" height="278" alt="" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}
+        <span class="shot-num">{{$pos}}</span>
+      </div>
+      <div class="shot-text">
+        <a class="shot-title bl-title" href="/film/{{.ID}}"><span class="visually-hidden">Scene {{$pos}}: </span>{{.Title}}</a>
+        {{if .Year}}<span class="muted">{{.Year}}</span>{{end}}
+        <span class="bl-note">{{$note}}</span>
+      </div>
+      <div class="shot-tools">
+        <form method="post" action="/ballot/move" hx-post="/ballot/move" hx-target="#ballot" hx-swap="outerHTML">
+          <input type="hidden" name="pos" value="{{$pos}}"><input type="hidden" name="dir" value="up">
+          <button class="icon-btn" {{if eq $pos 1}}disabled{{end}} aria-label="Move {{.Title}} up" title="Move up">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+        </form>
+        <form method="post" action="/ballot/move" hx-post="/ballot/move" hx-target="#ballot" hx-swap="outerHTML">
+          <input type="hidden" name="pos" value="{{$pos}}"><input type="hidden" name="dir" value="down">
+          <button class="icon-btn" {{if eq $pos 5}}disabled{{end}} aria-label="Move {{.Title}} down" title="Move down">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        </form>
+        <form method="post" action="/ballot/remove" hx-post="/ballot/remove" hx-target="#ballot" hx-swap="outerHTML">
+          <input type="hidden" name="pos" value="{{$pos}}">
+          <button class="icon-btn" aria-label="Remove {{.Title}}" title="Remove">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+        </form>
+      </div>
+    </li>
+    {{else}}
+    <li class="shot shot-empty">
+      <a class="shot-frame" href="#q" aria-label="Add scene {{$pos}}"><span class="shot-num">{{$pos}}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></a>
+      <a class="shot-text" href="#q">
+        <span class="shot-label">Scene {{$pos}}</span>
+        <span class="muted bl-hint">{{.Hint}}</span>
+      </a>
+    </li>
+    {{end}}
+    {{end}}
+  </ol>
+  {{if .Flash}}<p class="flash" role="alert">{{.Flash}}</p>{{end}}
+  <form class="cast" method="post" action="/ballot/cast" hx-post="/ballot/cast" hx-target="#ballot" hx-swap="outerHTML show:top">
+    <button class="btn btn-primary btn-wide" {{if or (not .Full) .Done}}disabled{{end}}>{{.CastLabel}}</button>
+    <p class="muted small">Scene one earns 5 points, scene five earns 1.{{if .Cast}}{{if not .Done}} Your earlier five are counted until you replace them.{{end}}{{end}}</p>
+  </form>
+</div>
+{{end}}
+
+{{define "results"}}
+<div id="results" class="results"{{if .OOB}} hx-swap-oob="true"{{end}}>
+  {{if .Err}}<p class="flash" role="alert">{{.Err}}</p>
+  {{else if and .Searched (not .Movies)}}<p class="muted results-hint">No films called “{{.Query}}”. Try the original title, or fewer words.</p>
+  {{else if .Prompt}}
+  <div class="bl-start">
+    <h2 class="bl-start-head">Not sure where to start?</h2>
+    <p class="bl-prompt">{{.Prompt}}</p>
+    <p class="muted bl-start-sub">Start with that one{{if .Ideas}}, or borrow from Filmstop’s top five{{else}}: type its title above{{end}}.</p>
+    {{with .Ideas}}{{template "hits" ($.Hits .)}}{{end}}
+  </div>
+  {{end}}
+  {{with .Movies}}{{template "hits" ($.Hits .)}}{{end}}
+</div>
+{{end}}
+
+{{define "hits"}}
+<ul class="hits">
+  {{range .Movies}}{{$p := index $.Picked .ID}}
+  <li>
+    <form method="post" action="/ballot/pick" hx-post="/ballot/pick" hx-target="#ballot" hx-swap="outerHTML">
+      <input type="hidden" name="id" value="{{.ID}}">
+      <button class="hit" {{if $p}}disabled{{end}}>
+        {{if .PosterPath}}<img src="{{poster .PosterPath "w92"}}" width="44" height="66" alt="" loading="lazy" decoding="async">{{else}}{{template "blank-still"}}{{end}}
+        <span class="hit-text"><strong>{{.Title}}</strong>{{if .Year}}<span class="muted">{{.Year}}</span>{{end}}</span>
+        {{if $p}}<span class="hit-state"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Scene {{$p}}</span>
+        {{else}}<span class="hit-add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add</span>{{end}}
+      </button>
+    </form>
+  </li>
+  {{end}}
+</ul>
+{{end}}

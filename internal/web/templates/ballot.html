@@ -1,0 +1,30 @@
+{{define "content"}}
+<section class="wrap booth" hx-include="#q">
+  <div class="booth-intro">
+    <h1 class="film-title">Storyboard your five</h1>
+    <p class="logline">Five films, best first. Not the most important films ever made: the ones that made you.</p>
+  </div>
+  <div class="booth-board">
+    {{template "ballot-panel" .Ballot}}
+  </div>
+  <div class="booth-search">
+    <form class="search" action="/ballot" method="get" role="search">
+      <label for="q" class="visually-hidden">Search films</label>
+      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input id="q" name="q" type="search" value="{{.Results.Query}}" autocomplete="off" spellcheck="false"
+        placeholder="Search for a film"
+        {{if not .Search}}disabled{{end}}
+        hx-get="/search" hx-trigger="input changed delay:250ms, search" hx-target="#results" hx-swap="outerHTML"
+        hx-sync="this:replace" hx-indicator="#results">
+    </form>
+    {{if not .Search}}<p class="flash">Search is switched off on this server: it needs a TMDB API key.</p>{{end}}
+    {{template "results" .Results}}
+  </div>
+</section>
+<script>
+// "Add scene N" jumps to the search box and puts the cursor in it.
+document.addEventListener("click", e => {
+  if (e.target.closest('a[href="#q"]')) { e.preventDefault(); const q = document.getElementById("q"); q.focus(); q.scrollIntoView({ block: "center", behavior: "smooth" }); }
+});
+</script>
+{{end}}

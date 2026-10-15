@@ -1,0 +1,83 @@
+{{define "f5-still"}}{{/* . = fivePick */}}{{with .BackdropPath}}<img src="{{poster . "w780"}}" srcset="{{poster . "w300"}} 300w, {{poster . "w780"}} 780w" sizes="(min-width: 1100px) 25vw, (min-width: 600px) 46vw, 140px" width="780" height="439" alt="" loading="lazy" decoding="async">{{else}}{{with $.PosterPath}}<img class="from-poster" src="{{poster . "w500"}}" width="500" height="750" alt="" loading="lazy" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}{{end}}
+
+{{define "f5-place"}}{{/* . = fivePick */}}{{if eq .Place 1}}Filmstop’s number one{{else}}No. {{.Place}} on Filmstop{{end}}{{end}}
+
+{{define "content"}}
+{{$one := .One}}
+<section class="opening f5-opening" aria-labelledby="f5-title">
+  <div class="opening-still">
+    {{with $one.BackdropPath}}
+    <img src="{{poster . "w1280"}}" srcset="{{poster . "w780"}} 780w, {{poster . "w1280"}} 1280w, {{poster . "original"}} 1920w" sizes="100vw" width="1280" height="720" alt="" fetchpriority="high" decoding="async">
+    {{else}}{{with $one.PosterPath}}<img class="from-poster" src="{{poster . "w780"}}" width="780" height="1170" alt="" fetchpriority="high" decoding="async">{{end}}{{end}}
+  </div>
+  <div class="title-card">
+    <p class="kicker">Number one in {{if .Owner}}your five{{else}}someone’s five{{end}}</p>
+    <h1 id="f5-title" class="film-title">{{$one.Title}}</h1>
+    <p class="credit">{{template "credit" $one.Movie}}</p>
+  </div>
+</section>
+
+<section class="wrap f5-bill" aria-label="The programme">
+  <p class="f5-billing"><span class="f5-name">{{$one.Title}}</span>{{range $i, $p := .Rest}}{{if eq $i 3}} and {{else}}, {{end}}<span class="f5-name">{{$p.Title}}</span>{{end}}. In that order.</p>
+  <div class="f5-actions">
+    {{if .Owner}}
+    <button class="btn btn-primary" type="button" id="f5-copy" data-path="/five/{{.Code}}">Copy link</button>
+    <a class="btn f5-quiet" href="/ballot">Edit your five</a>
+    <p class="f5-copied" id="f5-copied" role="status"></p>
+    <input class="f5-url" id="f5-url" type="text" readonly hidden aria-label="Link to your five">
+    {{else}}
+    <a class="btn btn-primary" href="/ballot">Pick your own five</a>
+    {{end}}
+  </div>
+</section>
+
+<section class="wrap f5-strip-wrap" aria-labelledby="f5-rest">
+  <h2 id="f5-rest" class="visually-hidden">Two to five</h2>
+  <ol class="f5-strip" start="2">
+    {{range .Rest}}
+    <li class="f5-scene">
+      <div class="scene-still f5-still">
+        {{template "f5-still" .}}
+        <span class="f5-num" aria-hidden="true">{{.Pos}}</span>
+      </div>
+      <div class="f5-text">
+        <h3 class="film-title"><span class="visually-hidden">Number {{.Pos}}: </span>{{.Title}}</h3>
+        <p class="credit">{{if .Director}}{{.Director}} · {{end}}{{.Year}}</p>
+        {{if .Place}}<p class="f5-place">{{template "f5-place" .}}</p>{{end}}
+      </div>
+    </li>
+    {{end}}
+  </ol>
+</section>
+
+<section class="wrap f5-reading" aria-labelledby="f5-reading-head">
+  <div class="f5-reading-head">
+    <h2 id="f5-reading-head" class="section-title">{{if .Owner}}What your five says{{else}}What this five says{{end}}</h2>
+    <p class="f5-headline film-title">{{.Taste.Headline}}</p>
+  </div>
+  <div class="f5-prose">
+    {{range .Taste.Paras}}<p>{{range .}}{{if .Film}}<span class="f5-name">{{.Text}}</span>{{else}}{{.Text}}{{end}}{{end}}</p>
+    {{end}}
+    {{if not .Owner}}
+    <p class="f5-cta"><a class="btn btn-primary" href="/ballot">Pick your own five</a> <a class="f5-link" href="/">See the whole list</a></p>
+    {{end}}
+  </div>
+</section>
+
+{{if .Owner}}
+<script>
+(() => {
+  const btn = document.getElementById("f5-copy"), url = document.getElementById("f5-url"), said = document.getElementById("f5-copied");
+  const link = location.origin + btn.dataset.path;
+  const fallback = () => { url.value = link; url.hidden = false; url.focus(); url.select(); said.textContent = "Copy the link from the box."; };
+  btn.addEventListener("click", () => {
+    if (!navigator.clipboard) return fallback();
+    navigator.clipboard.writeText(link).then(() => {
+      btn.textContent = "Link copied"; said.textContent = "Anyone with the link sees this page.";
+      setTimeout(() => { btn.textContent = "Copy link"; }, 2400);
+    }, fallback);
+  });
+})();
+</script>
+{{end}}
+{{end}}

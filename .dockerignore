@@ -1,0 +1,8 @@
+.git
+*.db
+*.db-shm
+*.db-wal
+/filmstop
+.env
+Dockerfile
+compose.yaml
