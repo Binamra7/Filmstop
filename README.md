@@ -1,10 +1,10 @@
 # Filmstop
 
 Everyone picks their five favourite films, in order. Filmstop counts every ballot
-into one list.
+into one list. Live at **https://filmstop.onrender.com**.
 
-Go + Gin on the server, htmx in the browser, SQLite on disk. It ships as one binary
-with its templates, CSS, font and htmx embedded.
+Go + Gin on the server, htmx in the browser, SQLite on disk (Turso in production).
+It ships as one binary with its templates, CSS, font and htmx embedded.
 
 ## What's on it
 
@@ -30,6 +30,8 @@ go run .                       # http://localhost:8080
 | `PORT` | `8080` | |
 | `DATABASE_PATH` | `filmstop.db` | SQLite file. Put it on a persistent disk |
 | `TMDB_API_KEY` | none | Needed for film search |
+| `TURSO_DATABASE_URL` | none | Use this Turso database instead of the SQLite file |
+| `TURSO_AUTH_TOKEN` | none | Token for `TURSO_DATABASE_URL` |
 
 For a list with something on it, seed made-up ballots (local only, never
 production):
@@ -41,7 +43,7 @@ go run ./cmd/seed -db filmstop.db -voters 400 -days 45
 It needs no network: 72 real films (with their TMDB ids) and voters in taste
 clusters, cast over the last few weeks, so every programme note, film page and
 "latest ballots" line has something to say. With `TMDB_API_KEY` set it also
-fetches each film's real details and still. It then prints cookies for a few
+fetches each film's real details, still and poster. It then prints cookies for a few
 personas (a voter with a card, a kindred ballot, an open draft, a newcomer
 halfway through) so you can browse as each one. Rerunning on the same database
 replaces the seeded ballots rather than adding more.
@@ -75,9 +77,13 @@ database is [Turso](https://turso.tech) (hosted SQLite). Without
    does the rest.
 
 The free service sleeps after 15 idle minutes, and the next visit takes about a
-minute to wake it. Don't seed the production database: the seed's ballots are
-made up, and it refuses to run while `TURSO_DATABASE_URL` is set unless you pass
-`-remote`.
+minute to wake it. Set the Turso variables in Render only, not in your local
+`.env`, so local runs never touch production.
+
+The seed's ballots are made up, so it refuses to write to a remote database
+unless you pass `-remote`. Over the network it writes one ballot per transaction,
+so a large remote seed is slow. After seeding, restart the service in Render: the
+server reads the board at startup.
 
 ## How the list is counted
 
@@ -97,6 +103,7 @@ internal/store       SQLite: films, drafts, counted ballots
 internal/tmdb        TMDB search with an in-memory cache
 internal/web         Gin handlers, htmx fragments, templates, static assets
 DESIGN.md            the visual system
+render.yaml          Render Blueprint (free web service)
 ```
 
 ## Speed
