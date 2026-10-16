@@ -152,6 +152,8 @@ func Open(src string) (*Store, error) {
 		// instead of failing with SQLITE_BUSY halfway through.
 		driver = "sqlite"
 		dsn = "file:" + src + "?_txlock=immediate&_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)&_pragma=foreign_keys(ON)"
+	} else {
+		installStaleRetry()
 	}
 	db, err := sql.Open(driver, dsn)
 	if err != nil {
