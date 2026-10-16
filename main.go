@@ -48,7 +48,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	st, err := store.Open(env("DATABASE_PATH", "filmstop.db"))
+	st, err := store.Open(store.Source(env("DATABASE_PATH", "filmstop.db")))
 	if err != nil {
 		slog.Error("open database", "err", err)
 		os.Exit(1)

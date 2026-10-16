@@ -8,10 +8,13 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"net/url"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/Binamra7/filmstop/internal/rank"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 	_ "modernc.org/sqlite"
 )
 
@@ -112,15 +115,42 @@ func migrate(db *sql.DB) error {
 	return nil
 }
 
-func Open(path string) (*Store, error) {
-	dsn := "file:" + path + "?_txlock=immediate&_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)&_pragma=foreign_keys(ON)"
-	db, err := sql.Open("sqlite", dsn)
+// Source picks the database: Turso when TURSO_DATABASE_URL is set (hosts whose
+// disk is wiped on restart), otherwise the SQLite file at path.
+func Source(path string) string {
+	u := os.Getenv("TURSO_DATABASE_URL")
+	if u == "" {
+		return path
+	}
+	if t := os.Getenv("TURSO_AUTH_TOKEN"); t != "" {
+		u += "?authToken=" + url.QueryEscape(t)
+	}
+	return u
+}
+
+func remote(src string) bool {
+	for _, p := range []string{"libsql://", "https://", "http://"} {
+		if strings.HasPrefix(src, p) {
+			return true
+		}
+	}
+	return false
+}
+
+// Open takes a SQLite file path or a Turso URL from Source.
+func Open(src string) (*Store, error) {
+	driver, dsn := "libsql", src
+	if !remote(src) {
+		// WAL lets readers run in parallel. Transactions take the write lock up
+		// front (_txlock=immediate), so concurrent writers queue on busy_timeout
+		// instead of failing with SQLITE_BUSY halfway through.
+		driver = "sqlite"
+		dsn = "file:" + src + "?_txlock=immediate&_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)&_pragma=foreign_keys(ON)"
+	}
+	db, err := sql.Open(driver, dsn)
 	if err != nil {
 		return nil, err
 	}
-	// WAL lets readers run in parallel. Transactions take the write lock up front
-	// (_txlock=immediate), so concurrent writers queue on busy_timeout instead of
-	// failing with SQLITE_BUSY halfway through.
 	db.SetMaxOpenConns(8)
 	db.SetMaxIdleConns(8)
 	if _, err := db.Exec(schema + fiveSchema); err != nil {
