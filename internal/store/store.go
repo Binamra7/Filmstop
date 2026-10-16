@@ -195,7 +195,8 @@ func (s *Store) UpsertMovies(ctx context.Context, ms []Movie) error {
 	stmt, err := tx.PrepareContext(ctx, `INSERT INTO movies (id, title, year, poster_path, backdrop_path, overview)
 		VALUES (?, ?, ?, ?, ?, ?)
 		ON CONFLICT(id) DO UPDATE SET title = excluded.title, year = excluded.year,
-			poster_path = excluded.poster_path, overview = excluded.overview,
+			poster_path = CASE WHEN excluded.poster_path = '' THEN poster_path ELSE excluded.poster_path END,
+			overview = excluded.overview,
 			backdrop_path = CASE WHEN excluded.backdrop_path = '' THEN backdrop_path ELSE excluded.backdrop_path END`)
 	if err != nil {
 		return err
@@ -237,11 +238,18 @@ func (s *Store) Movies(ctx context.Context, ids []int64) (map[int64]Movie, error
 	return out, rows.Err()
 }
 
-// SetDetails stores a film's details, and its backdrop if TMDB gave one.
-func (s *Store) SetDetails(ctx context.Context, id int64, backdrop string, d Details) error {
-	_, err := s.db.ExecContext(ctx, `UPDATE movies SET tagline = ?, director = ?, runtime = ?, genres = ?, detailed = 1,
-		backdrop_path = CASE WHEN ? = '' THEN backdrop_path ELSE ? END WHERE id = ?`,
-		d.Tagline, d.Director, d.Runtime, d.Genres, backdrop, backdrop, id)
+// SetDetails stores a film's details, and its backdrop and poster if TMDB gave
+// them. Only details with Detailed set (those from TMDB) stop the server
+// fetching them.
+func (s *Store) SetDetails(ctx context.Context, id int64, backdrop, poster string, d Details) error {
+	detailed := 0
+	if d.Detailed {
+		detailed = 1
+	}
+	_, err := s.db.ExecContext(ctx, `UPDATE movies SET tagline = ?, director = ?, runtime = ?, genres = ?, detailed = ?,
+		backdrop_path = CASE WHEN ? = '' THEN backdrop_path ELSE ? END,
+		poster_path = CASE WHEN ? = '' THEN poster_path ELSE ? END WHERE id = ?`,
+		d.Tagline, d.Director, d.Runtime, d.Genres, detailed, backdrop, backdrop, poster, poster, id)
 	return err
 }
 
@@ -345,8 +353,39 @@ func (s *Store) EditDraft(ctx context.Context, voter string, fn func(b *Ballot))
 	return b, tx.Commit()
 }
 
+// ClearVoter deletes the voter's counted ballot and draft.
+func (s *Store) ClearVoter(ctx context.Context, voter string) error {
+	return s.clearVoters(ctx, `voter = ?`, voter)
+}
+
+// ClearVotersWithPrefix deletes the counted ballots and drafts of every voter
+// whose id starts with prefix (the seed's made-up voters, say).
+func (s *Store) ClearVotersWithPrefix(ctx context.Context, prefix string) error {
+	return s.clearVoters(ctx, `substr(voter, 1, ?) = ?`, len(prefix), prefix)
+}
+
+func (s *Store) clearVoters(ctx context.Context, where string, args ...any) error {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	for _, t := range []string{"ballots", "ballot_times", "drafts", "draft_open"} {
+		if _, err := tx.ExecContext(ctx, `DELETE FROM `+t+` WHERE `+where, args...); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
 // Cast replaces the voter's counted ballot with b and clears their draft.
 func (s *Store) Cast(ctx context.Context, voter string, b Ballot) error {
+	return s.CastAt(ctx, voter, b, time.Now())
+}
+
+// CastAt is Cast with the ballot stamped at the given time, so seeded ballots
+// can arrive over days rather than all in one second.
+func (s *Store) CastAt(ctx context.Context, voter string, b Ballot, at time.Time) error {
 	if !b.Full() {
 		return errors.New("ballot needs five films")
 	}
@@ -366,7 +405,7 @@ func (s *Store) Cast(ctx context.Context, voter string, b Ballot) error {
 			return err
 		}
 	}
-	if _, err := tx.ExecContext(ctx, `INSERT INTO ballot_times (voter, cast_at) VALUES (?, ?)`, voter, time.Now().Unix()); err != nil {
+	if _, err := tx.ExecContext(ctx, `INSERT INTO ballot_times (voter, cast_at) VALUES (?, ?)`, voter, at.Unix()); err != nil {
 		return err
 	}
 	return tx.Commit()

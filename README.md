@@ -31,12 +31,20 @@ go run .                       # http://localhost:8080
 | `DATABASE_PATH` | `filmstop.db` | SQLite file. Put it on a persistent disk |
 | `TMDB_API_KEY` | none | Needed for film search |
 
-For a list with something on it, seed simulated ballots over real TMDB films
-(local only, the votes are made up):
+For a list with something on it, seed made-up ballots (local only, never
+production):
 
 ```sh
-go run ./cmd/seed -db filmstop.db -voters 400
+go run ./cmd/seed -db filmstop.db -voters 400 -days 45
 ```
+
+It needs no network: 72 real films (with their TMDB ids) and voters in taste
+clusters, cast over the last few weeks, so every programme note, film page and
+"latest ballots" line has something to say. With `TMDB_API_KEY` set it also
+fetches each film's real details and still. It then prints cookies for a few
+personas (a voter with a card, a kindred ballot, an open draft, a newcomer
+halfway through) so you can browse as each one. Rerunning on the same database
+replaces the seeded ballots rather than adding more.
 
 ## Docker
 
@@ -67,12 +75,9 @@ database is [Turso](https://turso.tech) (hosted SQLite). Without
    does the rest.
 
 The free service sleeps after 15 idle minutes, and the next visit takes about a
-minute to wake it. For demo data, seed Turso from your machine, then restart the
-service in Render:
-
-```sh
-TURSO_DATABASE_URL=libsql://... TURSO_AUTH_TOKEN=... TMDB_API_KEY=... go run ./cmd/seed -voters 400
-```
+minute to wake it. Don't seed the production database: the seed's ballots are
+made up, and it refuses to run while `TURSO_DATABASE_URL` is set unless you pass
+`-remote`.
 
 ## How the list is counted
 
