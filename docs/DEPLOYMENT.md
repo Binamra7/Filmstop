@@ -10,6 +10,10 @@
 
 The free service sleeps after 15 minutes without traffic, and the next request waits about a minute while it starts.
 
+### Poster colours after a deploy
+
+Each film's colour comes from its poster, measured during the TMDB details fetch and stored in `movies.swatch`. After a deploy, the board measures the films on the list (up to 30) in the background, four at a time, that haven't been measured yet: for each one it fetches the details again plus the 92 px poster from `image.tmdb.org`, two small requests per film. Films already measured aren't fetched again, so after the first deploy with this feature only films new to the list cost anything. Other films are measured when their film page or a card that includes them is opened. Until a film is measured it gets a colour chosen from its TMDB id, so it can change colour once. A film with no readable poster is stored as `none` and keeps its id colour.
+
 ## Settings
 
 Set these in Render under **Environment**. Never commit them, and keep the Turso ones out of your local `.env`: there they would point local runs at production.
@@ -65,3 +69,4 @@ The personas' ballots stay. Remove those by their voter ids, which the seed prin
 | New ballots in the database don't show | The list is built in memory | Restart the service |
 | Search returns nothing | `TMDB_API_KEY` missing or wrong | Logs show `TMDB_API_KEY is not set` or the TMDB error |
 | First visit takes about a minute | Free service was asleep | Expected on the free plan |
+| A film's colour doesn't match its poster | Not measured yet, or the poster couldn't be read when it was (stored as `none`) | Open its film page; for `none`, run `UPDATE movies SET swatch = '' WHERE id = <tmdb id>` in Turso and open the page again |

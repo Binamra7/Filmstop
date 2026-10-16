@@ -24,8 +24,14 @@ The host had to be free with no time limit. Vercel runs Go only as short-lived f
 ### Distroless, non-root image
 The binary is static (`CGO_ENABLED=0`), so the runtime image needs no shell or libc. `gcr.io/distroless/static-debian12:nonroot` keeps the image small and runs as uid 65532. The container health check is the binary itself (`/filmstop -healthcheck`), since there's no `curl` in the image.
 
-### Dark only, no accent colour
-Films are watched in the dark, and the stills and posters already bring colour. A second theme or an accent would compete with them. [`DESIGN.md`](DESIGN.md) has the full system and the list of things it refuses.
+### Saul Bass title sequences, coloured by the posters
+The first design was dark only with no accent colour. It was readable but quiet, and the owner wanted the site to feel fun and interactive. The redesign treats each page as a Saul Bass opening: flat colour fields, cut-paper shapes, big type pasted slightly off level, and a short burst of movement. [`DESIGN.md`](DESIGN.md) has the full system.
+
+- **Fields come from the posters.** Each film's panel takes its colour from its own poster, so a film looks like itself across the list, the ballot and its page, and the colour arrives with the films instead of being imposed on them. The page underneath stays a warm black.
+- **A fixed set of fields, not raw poster colours.** A poster's dominant colour can be anything, and text on an arbitrary colour can't be guaranteed to read. So the measured colour is only used to choose one of eight fields, each with inks solved in advance to 8:1 for primary text and 7:1 for secondary. Any poster gives a readable panel, and the CSS stays a handful of classes. Trade-off: two posters of slightly different reds get the same red.
+- **Vermilion is for shapes only.** The house accent, vermilion `#E2321F`, can't reach 8:1 with either the black or the paper ink, so it never carries text. It marks the brand disc, cut shapes, focus and the active scene.
+- **Bricolage Grotesque, one variable family.** It replaced two fonts (Mona Sans and Bodoni Moda). Its weight (200–800) and width (75–100%) axes give the narrow, heavy display titles and the plain body text from the same files, so there's one family to load and pair. It isn't on the list of overused fonts the design refuses.
+- **CSS-only motion, one moment per page.** The openings, the strip movements and the cast sequence are CSS animations and view transitions, so there's still no JavaScript build, they survive htmx swaps, and `prefers-reduced-motion` turns them all off in one media query. Each page gets one authored moment and then stays still, because a sequence that repeats on every interaction stops being fun and starts getting in the way. Trade-off: view transitions between pages and on the ballot only animate in browsers that support them (Chromium); others just swap.
 
 ### The seed refuses remote databases by default
 The seed's ballots are made up. Production is a Turso URL, and that URL may be set in a shell for other reasons, so the seed refuses any remote database unless `-remote` is passed. Production was seeded on purpose for the demo; see [`DEPLOYMENT.md`](DEPLOYMENT.md).

@@ -1,25 +1,26 @@
 <div align="center">
 
-<img src="internal/web/static/favicon.svg" width="88" height="88" alt="Filmstop logo: a white letterboxed frame with two lines of credits on black" />
+<img src="internal/web/static/favicon.svg" width="88" height="88" alt="Filmstop logo: a vermilion disc cut across by a black bar, on warm black" />
 
 # Filmstop
 
 **Everyone names their five favourite films, in order. Filmstop counts every ballot into one list.**
 
-The list plays like the opening of a film: the number one as a widescreen scene,<br />
-two to five as scene selection, and the rest as end credits.
+The list plays like a Saul Bass title sequence: each film in a field of colour taken from its poster,<br />
+the number one as the opening scene, two to five as scene tiles, and the rest as end credits.
 
-[![Go 1.26](https://img.shields.io/badge/Go-1.26-0a0a0a?style=flat-square&logo=go&logoColor=00ADD8)](https://go.dev)
-[![Gin](https://img.shields.io/badge/server-Gin-0a0a0a?style=flat-square&logo=go&logoColor=F5F3EF)](https://gin-gonic.com)
-[![htmx 2](https://img.shields.io/badge/htmx-2.0-0a0a0a?style=flat-square&logo=htmx&logoColor=3D72D7)](https://htmx.org)
-[![SQLite and Turso](https://img.shields.io/badge/data-SQLite_%2F_Turso-0a0a0a?style=flat-square&logo=sqlite&logoColor=74C0FC)](https://turso.tech)
-[![CI](https://img.shields.io/github/actions/workflow/status/Binamra7/Filmstop/ci.yml?branch=main&style=flat-square&label=CI&labelColor=0a0a0a)](https://github.com/Binamra7/Filmstop/actions/workflows/ci.yml)
+[![Go 1.26](https://img.shields.io/badge/Go-1.26-15110e?style=flat-square&logo=go&logoColor=00ADD8)](https://go.dev)
+[![Gin](https://img.shields.io/badge/server-Gin-15110e?style=flat-square&logo=go&logoColor=F4ECDD)](https://gin-gonic.com)
+[![htmx 2](https://img.shields.io/badge/htmx-2.0-15110e?style=flat-square&logo=htmx&logoColor=E2321F)](https://htmx.org)
+[![SQLite and Turso](https://img.shields.io/badge/data-SQLite_%2F_Turso-15110e?style=flat-square&logo=sqlite&logoColor=8FC8C0)](https://turso.tech)
+[![No JS build](https://img.shields.io/badge/JS_build-none-E2321F?style=flat-square&labelColor=15110e)](#how-it-works)
+[![CI](https://img.shields.io/github/actions/workflow/status/Binamra7/Filmstop/ci.yml?branch=main&style=flat-square&label=CI&labelColor=15110e)](https://github.com/Binamra7/Filmstop/actions/workflows/ci.yml)
 
-[Live site](https://filmstop.onrender.com) · [Screenshots](#screenshots) · [Features](#features) · [Getting started](#getting-started) · [How it works](#how-it-works) · [Docs](#docs)
+[Live site](https://filmstop.onrender.com) · [Screenshots](#screenshots) · [Features](#features) · [Getting started](#getting-started) · [How it works](#how-it-works) · [Design](#design) · [Docs](#docs)
 
 <br />
 
-<img src="docs/screenshots/00-cover-phones.jpg" alt="Filmstop on three phones: the list opening on The Shawshank Redemption, a half-filled storyboard ballot, and a shared five led by In the Mood for Love" />
+<img src="docs/screenshots/00-cover-phones.jpg" alt="Filmstop on three phones: The Shawshank Redemption at number one on an orange field, the half-filled Storyboard your five ballot, and a voter's five card led by In the Mood for Love on a red field" />
 
 </div>
 
@@ -27,38 +28,54 @@ two to five as scene selection, and the rest as end credits.
 
 Most "best films" lists are one critic's opinion or an average of star ratings. Filmstop asks a narrower question: which five films made you, in order? Every ballot goes into one shared list, and position counts. A first place earns five points and a fifth place one, so a film that many people put first beats one that many people only mention.
 
-The interface stays out of the frame. The page is black with no accent colour; all the colour comes from the films' own stills and posters. Film titles are set in Bodoni Moda, like title cards, and everything you read or press is in Mona Sans.
+Each page plays like a Saul Bass title sequence cut from paper. Every film gets a flat field of colour taken from its own poster: the server measures the poster's dominant colour and maps it to one of eight fields, and each field's inks were solved to reach 8:1 contrast for primary text and 7:1 for secondary. Stills are printed in the field's colour and cropped by cut shapes, the title is pasted on a strip a few degrees off level, and casting your five plays a short title sequence that rolls your films as credits.
+
+<p align="center">
+  <img src="docs/screenshots/10-fields-grid.jpg" alt="Six film pages, each in a colour field taken from its poster: Taxi Driver in mustard, Vertigo in red, Inception in teal, Drive in rose, Back to the Future in navy and Interstellar in orange" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/orange-F49A44?style=for-the-badge" alt="orange #F49A44" />
+  <img src="https://img.shields.io/badge/mustard-EDB32B?style=for-the-badge" alt="mustard #EDB32B" />
+  <img src="https://img.shields.io/badge/rose-E9A6A0?style=for-the-badge" alt="rose #E9A6A0" />
+  <img src="https://img.shields.io/badge/aqua-8FC8C0?style=for-the-badge" alt="aqua #8FC8C0" /><br />
+  <img src="https://img.shields.io/badge/red-7A1810?style=for-the-badge" alt="red #7A1810" />
+  <img src="https://img.shields.io/badge/teal-134A50?style=for-the-badge" alt="teal #134A50" />
+  <img src="https://img.shields.io/badge/navy-1D2B57?style=for-the-badge" alt="navy #1D2B57" />
+  <img src="https://img.shields.io/badge/ink-2A2420?style=for-the-badge" alt="ink #2A2420" />
+  <img src="https://img.shields.io/badge/vermilion_(shapes_only)-E2321F?style=for-the-badge" alt="vermilion #E2321F, used for shapes only" />
+</p>
 
 There are no accounts. A signed cookie gives each visitor one ballot, which they can change at any time.
 
 ## Screenshots
 
-Captured on 17 October 2026 from the [live site](https://filmstop.onrender.com). The list holds about 5,000 ballots from the seed tool (made-up voters choosing from real films), so the counts are invented, but the pages are what visitors see.
+Captured on 17 October 2026 from the [live site](https://filmstop.onrender.com). The list holds seeded demo ballots from the seed tool (made-up voters choosing from real films), so the counts are invented, but the pages are what visitors see.
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/01-desktop-home.jpg" alt="Desktop: the list opens on The Shawshank Redemption with its tagline, 3,428 points and a bar for each place it was ranked" /></td>
-    <td width="50%"><img src="docs/screenshots/03-desktop-ballot.jpg" alt="Desktop: the storyboard with two of five scenes filled, next to search results for 'before'" /></td>
+    <td width="50%"><img src="docs/screenshots/01-desktop-home.jpg" alt="Desktop: The Shawshank Redemption at number one, its still printed in orange on an orange field beside a vermilion disc, with the title on a tilted paper strip" /></td>
+    <td width="50%"><img src="docs/screenshots/02-desktop-ballot.jpg" alt="Desktop: a half-filled storyboard of numbered paper strips, with empty slots marked cut here, beside search results for 'before'" /></td>
   </tr>
   <tr>
     <td align="center"><sub>The list opens on the number one</sub></td>
     <td align="center"><sub>Your five: a storyboard and live search</sub></td>
   </tr>
   <tr>
-    <td width="50%"><img src="docs/screenshots/02-desktop-film.jpg" alt="Desktop: The Shawshank Redemption's film page, with the story and where it stands" /></td>
-    <td width="50%"><img src="docs/screenshots/04-desktop-your-five.jpg" alt="Desktop: a shared five led by In the Mood for Love, with Copy link and Edit your five buttons" /></td>
+    <td width="50%"><img src="docs/screenshots/03-desktop-film.jpg" alt="Desktop: Vertigo's film page, Saul Bass's spiral artwork printed on a deep red field, with the title pasted on a cream strip" /></td>
+    <td width="50%"><img src="docs/screenshots/04-desktop-your-five.jpg" alt="Desktop: a voter's five card, In the Mood for Love at number one on a red field, its still cut into an uneven shape" /></td>
   </tr>
   <tr>
-    <td align="center"><sub>A film page</sub></td>
+    <td align="center"><sub>A film page: Vertigo</sub></td>
     <td align="center"><sub>A shareable five</sub></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <td width="33%"><img src="docs/screenshots/06a-phone-home.jpg" alt="Phone: the list's opening scene" /></td>
-    <td width="33%"><img src="docs/screenshots/06b-phone-ballot.jpg" alt="Phone: the storyboard ballot" /></td>
-    <td width="33%"><img src="docs/screenshots/06c-phone-your-five.jpg" alt="Phone: a shared five" /></td>
+    <td width="33%"><img src="docs/screenshots/06a-phone-home.jpg" alt="Phone: The Shawshank Redemption at number one on an orange field" /></td>
+    <td width="33%"><img src="docs/screenshots/06b-phone-ballot.jpg" alt="Phone: the ballot with Spirited Away in slot one and an empty slot marked cut here" /></td>
+    <td width="33%"><img src="docs/screenshots/06c-phone-your-five.jpg" alt="Phone: a five card with In the Mood for Love at number one, then 2001: A Space Odyssey and Tokyo Story" /></td>
   </tr>
 </table>
 
@@ -66,10 +83,16 @@ Captured on 17 October 2026 from the [live site](https://filmstop.onrender.com).
 <summary><b>More screenshots</b></summary>
 <br />
 
-<img src="docs/screenshots/05-desktop-credits.jpg" alt="Desktop: the end credits, a centred two-column roll of places six to thirty" />
+<img src="docs/screenshots/05-desktop-title-sequence.jpg" alt="Three frames of the title sequence after casting: red and cream bars wipe across the ballot, the five chosen films roll up as credits, then 'That's a wrap.' lands on a paper strip" />
+<p align="center"><sub>Casting plays a title sequence of your five (frames from a local build)</sub></p>
+
+<img src="docs/screenshots/07-desktop-two-to-five.jpg" alt="Desktop: places two to five as four tiles, each in its own colour field: The Dark Knight, Pulp Fiction, The Godfather and Spirited Away" />
+<p align="center"><sub>Two to five: scene tiles</sub></p>
+
+<img src="docs/screenshots/08-desktop-credits.jpg" alt="Desktop: Also starring, places six to thirty listed like end credits on black, with points, director, year and running time" />
 <p align="center"><sub>End credits: places six to thirty</sub></p>
 
-<img src="docs/screenshots/08-desktop-method.jpg" alt="Desktop: the How it works page explaining the scoring" />
+<img src="docs/screenshots/09-desktop-method.jpg" alt="Desktop: How the list is counted, beside a vermilion disc cut by a black bar, with a bar chart of points per place" />
 <p align="center"><sub>How it works: the scoring, explained on the site</sub></p>
 
 </details>
@@ -78,14 +101,14 @@ Captured on 17 October 2026 from the [live site](https://filmstop.onrender.com).
 
 **The list** (`/`)
 
-- The number one opens full-bleed with its tagline, its points and a bar for each place it was ranked
-- Two to five as a grid of scenes, six to thirty as rolling end credits
+- The number one opens full-bleed in its poster's colour field, with its tagline, its points and a bar for each place it was ranked
+- Two to five as four scene tiles, each in its own field; six to thirty as rolling end credits on black
 - Programme notes written from the votes: photo finishes, cult favourites, the most divisive film, a director with a clear lead
 - The latest ballots as they come in, with no voter named
 
 **Your five** (`/ballot`)
 
-- A five-scene storyboard. Search TMDB, then add, reorder or remove films; the draft saves on every change
+- Five numbered paper strips, each in its film's field. Search TMDB, then add, reorder or remove films; the draft saves on every change
 - Each pick shows how many others chose it and where it stands on the list
 - Casting counts the ballot; casting again later replaces it
 
@@ -93,6 +116,14 @@ Captured on 17 October 2026 from the [live site](https://filmstop.onrender.com).
 
 - `/film/:id`: the story, where the film stands, how voters place it, and the films that share its ballots
 - `/five/:code`: a shareable page of someone's five with a reading of their taste: which decades, how close to the consensus, kindred ballots
+
+**Motion**
+
+- The list, film pages and cards open with bars sweeping across the field, then the title strip drops into place
+- A new pick slides into its slot, a removed one slides out, and moved strips animate to their new places (view transitions named per film, through htmx's `transition:true`)
+- Casting plays a short title sequence: bars wipe across, your five titles roll as credits, then "That's a wrap." A click or any key skips it
+- Printed stills regain their full colour on hover or keyboard focus
+- With `prefers-reduced-motion` set, animations and transitions are turned off and the title sequence is not shown
 
 **Small and fast**
 
@@ -175,6 +206,8 @@ The server is Gin with Go's `html/template`. Pages are plain HTML forms that htm
 
 **Identity.** Each visitor gets a random id in an HMAC-signed, HttpOnly cookie. One cookie holds one ballot, and casting again replaces it. A POST whose `Origin` names another site is rejected.
 
+**Colour fields.** When the server fetches a film's details from TMDB, it also downloads the poster at TMDB's smallest size (`w92`, 92 px wide) and measures its dominant colour (`internal/tmdb/swatch.go`): each vivid pixel votes for one of 36 hue bins, weighted by saturation times value, and the winning bin's average colour is stored in the film's `swatch` column. At render time `fieldOf` in `internal/web/field.go` maps that colour's hue to one of the eight fields, with grey and very dark posters going to `ink`. A film not measured yet gets a field from its id, so its colour stays stable.
+
 **Storage.** SQLite through `database/sql`: the pure-Go `modernc.org/sqlite` driver for a local file, or Turso (hosted SQLite) over HTTP in production. Neither needs CGO.
 
 ```
@@ -182,10 +215,19 @@ main.go              server entry point: config, graceful shutdown, health-check
 cmd/seed/            demo data: built-in film catalogue, taste groups, personas
 internal/rank/       scoring and ordering (pure functions, tested)
 internal/store/      ballots, drafts, films and share codes, in SQLite or Turso
-internal/tmdb/       TMDB search with an in-memory cache, and per-film details
-internal/web/        Gin handlers, the list keeper, programme notes, templates, static files
+internal/tmdb/       TMDB search with an in-memory cache, per-film details, poster colour
+internal/web/        Gin handlers, the list keeper, programme notes, colour fields, templates, static files
 docs/                design, architecture, decisions, deployment, testing
 ```
+
+## Design
+
+The full system lives in [`docs/DESIGN.md`](docs/DESIGN.md), and the tokens are in [`internal/web/static/site.css`](internal/web/static/site.css). In short:
+
+- **Fields from posters:** each film takes one of eight colour fields from its poster's dominant colour. Every field defines its own ink, secondary ink and shape colour, checked to 8:1 and 7:1 contrast. Vermilion can't carry text at that contrast, so it is used only for shapes.
+- **Type:** one variable family, [Bricolage Grotesque](https://github.com/ateliertriay/bricolage), self-hosted, using its weight, width and optical size axes: heavy and narrow for titles and numbers, regular width for body text. Nothing is smaller than 14 px.
+- **Shapes:** stills and panels have cut edges from three reused polygons, stills are printed greyscale onto the field colour, and the decoration is limited to bars, discs and jagged strips. Sections are separated by changes of field, not boxes.
+- **Motion:** one authored moment per page (the opening sweep, a pick sliding in, the cast title sequence), then stillness.
 
 ## Docs
 
@@ -195,7 +237,7 @@ docs/                design, architecture, decisions, deployment, testing
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | Why Go and htmx, the scoring, SQLite and Turso, the hosting |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Render and Turso setup, secrets, seeding and resetting production |
 | [`docs/TESTING.md`](docs/TESTING.md) | Tests, benchmarks, CI and manual checks |
-| [`docs/DESIGN.md`](docs/DESIGN.md) | The visual system: colour roles, type, layout, motion |
+| [`docs/DESIGN.md`](docs/DESIGN.md) | The visual system: colour fields, type, shapes, layout, motion |
 | [`AGENTS.md`](AGENTS.md) | Working notes for coding agents and people |
 
 ## Testing
@@ -209,6 +251,7 @@ The tests cover the scoring and its tie-breaks, the ballot flow end to end throu
 ## Acknowledgements
 
 - Film data, stills and posters from [TMDB](https://www.themoviedb.org/). This product uses the TMDB API but is not endorsed or certified by TMDB.
-- [Bodoni Moda](https://github.com/indestructible-type/Bodoni) by indestructible type\* and [Mona Sans](https://github.com/github/mona-sans) by GitHub, both under the SIL Open Font License (see `internal/web/static/OFL.txt`)
+- [Bricolage Grotesque](https://github.com/ateliertriay/bricolage) by Mathieu Triay, under the SIL Open Font License (see `internal/web/static/OFL.txt`)
 - [htmx](https://htmx.org), under the Zero-Clause BSD licence
 - [Gin](https://gin-gonic.com), [modernc.org/sqlite](https://gitlab.com/cznic/sqlite) and [libsql-client-go](https://github.com/tursodatabase/libsql-client-go)
+- Visual approach after Saul Bass's title sequences and posters (*Vertigo*, *Anatomy of a Murder*, *The Man with the Golden Arm*)

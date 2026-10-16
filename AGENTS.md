@@ -40,15 +40,23 @@ internal/store/
   film.go               a film's tally and companion films
   notes.go              latest ballots; ballot_notes.go: how many share a pick
   remote.go             retrying HTTP transport for Turso
-internal/tmdb/          search (30-minute cache) and per-film details
+internal/tmdb/
+  tmdb.go               search (30-minute cache) and per-film details
+  swatch.go             a poster's dominant colour, measured with the details
 internal/web/
   server.go             routes, templates, page cache, static assets
   handlers.go           list, ballot, search, pick/move/remove/cast
   board.go              boardKeeper: the in-memory list, rebuilt after casts
   notes.go              programme notes and latest ballots
   film.go, five.go      film pages, cards and taste readings
+  field.go              fieldOf: poster swatch to one of eight colour fields
   voter.go              signed voter cookie, same-origin check
-  templates/, static/   embedded with go:embed
+  templates/            embedded with go:embed; layout.html declares the fonts
+  static/               embedded; every *.css is inlined on every page
+    site.css            tokens, colour fields, shared components (inlined first)
+    home.css, ballot.css, film.css, five.css   one per page
+    pages.css           the Method and not-found pages
+    bricolage.woff2, bricolage-ext.woff2       Bricolage Grotesque, Latin and Latin Extended
 docs/                   ARCHITECTURE, DECISIONS, DEPLOYMENT, TESTING, DESIGN
 render.yaml             Render Blueprint
 ```
@@ -60,7 +68,12 @@ render.yaml             Render Blueprint
 - **Handlers:** every action must work without JavaScript. Answer htmx requests (`HX-Request` header) with a fragment, and redirect plain form posts.
 - **Store:** multi-statement changes go in one transaction. The SQL must run on both SQLite and Turso (libSQL), so avoid driver-specific pragmas outside the local DSN.
 - **The list:** never compute the board per request. Change what `boardKeeper.rebuild` produces, and call `Touch` after anything that changes ballots.
-- **Templates and CSS:** follow `docs/DESIGN.md`. Dark only, no accent colour, nothing smaller than 14px, secondary text at 7:1 contrast or more. CSS custom properties live in `static/site.css`.
+- **Templates and CSS:** read `docs/DESIGN.md` before any UI work. CSS custom properties and the field classes live in `static/site.css`.
+  - **Colour:** only through the field classes (`field-{{field .Swatch .ID}}` in templates) and their variables `--field`, `--on`, `--on-2` and `--shape`, plus the house tokens in `site.css`. No raw hex in page CSS. Vermilion (`--cut`) is for shapes, never text.
+  - **Scoping:** every `static/*.css` is inlined on every page, so scope page CSS under the page's wrapper class (`.page-list`, `.booth`, `.film-page`, `.five-page`, `.method-page`, `.nf-page`) or a prefix only that page uses.
+  - **Tilt:** at most one tilted or pasted element per view. The ballot strips are the exception.
+  - **Legibility:** nothing smaller than 14px; primary text at 8:1 contrast or more, secondary at 7:1. Check new colours with `~/.claude/skills/human-design/scripts/contrast.py`.
+  - **Motion:** CSS only, one authored moment per page, and everything must still work and show its final state under `prefers-reduced-motion`.
 - **Tests:** next to the code (`foo_test.go`). Store tests use a real SQLite file in `t.TempDir()`, not mocks.
 - **Commits:** Conventional Commits, title line only (`fix(store): ...`, `docs: ...`).
 

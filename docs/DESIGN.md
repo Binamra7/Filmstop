@@ -21,6 +21,8 @@ The base of the page is the cinema in the dark, a warm black. Colour arrives wit
 | `--ink` | `#15110E` | Warm black: the page, and text on light fields |
 | `--paper` | `#F4ECDD` | Off-white paper: text on dark fields, primary button |
 | `--paper-2` | `#A69F95` | Secondary text on the black page (7.17:1) |
+| `--paper-ink-2` | `#55493F` | Secondary text on paper sections and the search bar (7.42:1) |
+| `--ink-raised` | `#221C17` | A row lifted off the black page on hover (no text contrast role) |
 | `--cut` | `#E2321F` | Vermilion. Shapes only, never text: the brand mark, cut shapes, focus, the active scene |
 
 ### Film fields
