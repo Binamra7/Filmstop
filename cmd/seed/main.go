@@ -88,7 +88,7 @@ func main() {
 		sem     = make(chan struct{}, 4) // as many at once as the server's board
 	)
 	for _, fm := range catalogue {
-		if have[fm.ID].Detailed {
+		if have[fm.ID].Complete() {
 			fetched.Add(1)
 			continue
 		}

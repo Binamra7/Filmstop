@@ -27,7 +27,7 @@ func (s *Store) FilmTally(ctx context.Context, id int64) (rank.Tally, error) {
 func (s *Store) Companions(ctx context.Context, id int64, limit int) ([]Companion, error) {
 	// 6 - position is rank.Points for that position.
 	rows, err := s.db.QueryContext(ctx, `SELECT m.id, m.title, m.year, m.poster_path, m.backdrop_path, m.overview,
-		m.tagline, m.director, m.runtime, m.genres, m.detailed, count(*) AS shared
+		m.tagline, m.director, m.runtime, m.genres, m.detailed, m.swatch, count(*) AS shared
 		FROM ballots a
 		JOIN ballots b ON b.voter = a.voter AND b.movie_id != a.movie_id
 		JOIN movies m ON m.id = b.movie_id
@@ -43,7 +43,7 @@ func (s *Store) Companions(ctx context.Context, id int64, limit int) ([]Companio
 	for rows.Next() {
 		var c Companion
 		if err := rows.Scan(&c.ID, &c.Title, &c.Year, &c.PosterPath, &c.BackdropPath, &c.Overview,
-			&c.Tagline, &c.Director, &c.Runtime, &c.Genres, &c.Detailed, &c.Shared); err != nil {
+			&c.Tagline, &c.Director, &c.Runtime, &c.Genres, &c.Detailed, &c.Swatch, &c.Shared); err != nil {
 			return nil, err
 		}
 		out = append(out, c)

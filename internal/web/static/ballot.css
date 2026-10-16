@@ -1,27 +1,253 @@
-/* Ballot: company notes, the empty-search starter, the wrap. Loaded after site.css. */
+/* Your five: the storyboard. Five paper strips, stacked with slight tilts, each
+   in its film's field; a search bar beside them; a title sequence when cast.
+   Every rule is scoped under .booth (or a bl- class only this page renders), so
+   nothing leaks onto the card page, which shares body.page-ballot. */
 
-/* A picked film's title links to its page; the row's buttons stay separate. */
-.bl-title { color: var(--text); text-decoration: none; align-self: start; }
-.bl-title:hover { text-decoration: underline; text-decoration-color: var(--text-2); }
-.bl-note { margin-top: 4px; font-size: 14px; line-height: 1.4; color: var(--text-2); text-wrap: pretty; }
-.shot { align-items: start; }
-.shot-tools { align-self: center; }
-.shot-empty { align-items: center; }
-.bl-hint { text-wrap: pretty; }
-
-/* Empty search: something to think about, then the list's top five. */
-.bl-start { padding: 6px 4px 0; }
-.bl-start-head { font-size: 18px; font-weight: 650; }
-.bl-prompt {
-  margin-top: 10px; max-width: 30ch;
-  font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 500;
-  font-size: clamp(24px, 1rem + 1.2vw, 30px); line-height: 1.2; text-wrap: balance;
+.booth { display: grid; gap: 40px; padding-top: 20px; }
+@media (min-width: 1000px) {
+  .booth {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-areas: "intro intro" "board search";
+    column-gap: 64px; row-gap: 48px;
+  }
+  .bl-intro { grid-area: intro; }
+  .bl-board-col { grid-area: board; }
+  .bl-search-col { grid-area: search; }
 }
-.bl-start-sub { margin-top: 10px; font-size: 16px; }
-.bl-start .hits { margin: 14px -4px 0; }
 
-/* That's a wrap */
-.bl-done-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
-.bl-done-actions .btn { flex: 1 1 auto; }
-.bl-text-link { padding: 10px 2px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--line-strong); }
-.bl-text-link:hover { text-decoration-color: var(--text); }
+/* ---------- Intro */
+.bl-intro { position: relative; padding-right: clamp(64px, 14vw, 200px); }
+.booth .bl-h1 { font-size: clamp(50px, 1.4rem + 6.4vw, 128px); font-stretch: 75%; line-height: 0.84; }
+.bl-logline { margin-top: 18px; max-width: 46ch; color: var(--paper-2); font-size: 18px; }
+.booth .bl-disc {
+  position: absolute; right: 0; top: 4px; width: clamp(54px, 12vw, 170px); overflow: hidden;
+}
+/* The brand's cut: an ink bar slicing the disc. */
+.booth .bl-disc::after {
+  content: ""; position: absolute; left: -10%; right: -10%; top: 58%; height: 17%;
+  background: var(--ink); transform: rotate(-12deg);
+}
+
+/* ---------- Board */
+.bl-board-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+.bl-board-title { font-weight: 800; font-stretch: 78%; font-size: clamp(30px, 1rem + 2vw, 44px); line-height: 0.9; letter-spacing: -0.02em; }
+.bl-count { color: var(--paper-2); font-weight: 650; font-size: 17px; white-space: nowrap; }
+.bl-count .num { font-size: 40px; line-height: 0.8; color: var(--paper); margin-right: 4px; }
+
+.bl-scenes { display: grid; gap: 18px; padding: 4px 2px; }
+
+/* A filled scene: a strip of the film's field, pasted down a little off level. */
+.booth .bl-scene { position: relative; transition: transform 200ms var(--ease-out); }
+.booth .bl-scene:nth-child(odd) { transform: rotate(-0.8deg); }
+.booth .bl-scene:nth-child(even) { transform: rotate(0.6deg); }
+.booth .bl-scene:not(.bl-empty) {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr) 44px;
+  grid-template-areas: "num still tools" "text text text";
+  gap: 12px 12px; padding: 14px 12px 18px 14px;
+  clip-path: var(--cut-a);
+  view-transition-class: bl-scene;
+}
+.booth .bl-scene:not(.bl-empty):nth-child(even) { clip-path: var(--cut-c); }
+.booth .bl-scene:not(.bl-empty):hover { transform: rotate(0deg) translateX(4px); }
+/* An ink film would vanish into the ink page, so it is printed on bare paper. */
+.booth .bl-scene.field-ink { --field: var(--paper); --on: var(--ink); --on-2: #55493f; }
+.booth .bl-scene.field-ink .printed img { mix-blend-mode: multiply; filter: grayscale(1) contrast(1.25) brightness(1.08); opacity: 1; }
+.booth .bl-scene.field-ink:hover .printed img { filter: none; }
+
+.booth .bl-num {
+  grid-area: num; align-self: start;
+  font-size: 68px; line-height: 0.78; color: var(--on); text-decoration: none;
+}
+.booth .bl-still { grid-area: still; display: block; aspect-ratio: 16 / 9; clip-path: var(--cut-b); }
+.booth .bl-scene:nth-child(even) .bl-still { clip-path: var(--cut-a); }
+.booth .bl-still img { transition: filter 240ms var(--ease-out), transform 400ms var(--ease-out); }
+.booth .bl-scene:hover .bl-still img { transform: scale(1.05); }
+
+.booth .bl-text { grid-area: text; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.booth .bl-title {
+  color: var(--on); text-decoration: none; align-self: start;
+  font-weight: 800; font-stretch: 80%; font-size: 27px; line-height: 0.95; letter-spacing: -0.015em; text-wrap: balance;
+}
+.booth .bl-title:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.booth .bl-year { color: var(--on-2); font-weight: 650; font-size: 16px; }
+.booth .bl-note { margin-top: 6px; font-size: 15px; line-height: 1.4; color: var(--on-2); text-wrap: pretty; }
+
+/* Tools: little cut paper tabs that press in. */
+.booth .bl-tools { grid-area: tools; display: flex; flex-direction: column; gap: 4px; align-self: start; }
+.booth .bl-tool {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0;
+  color: var(--on); background: color-mix(in srgb, var(--on) 13%, transparent);
+  clip-path: var(--cut-c);
+  transition: transform 150ms var(--ease-out), background-color 150ms;
+}
+.booth .bl-tool svg { width: 22px; height: 22px; stroke-width: 2.75; transition: transform 200ms var(--ease-back); }
+.booth .bl-tool:hover:not(:disabled) { background: color-mix(in srgb, var(--on) 24%, transparent); }
+.booth form:first-child .bl-tool:hover:not(:disabled) svg { transform: translateY(-3px); }
+.booth form:nth-child(2) .bl-tool:hover:not(:disabled) svg { transform: translateY(3px); }
+.booth .bl-tool-cut:hover svg { transform: rotate(90deg); }
+.booth .bl-tool:active:not(:disabled) { transform: translateY(2px) scale(0.92); }
+.booth .bl-tool:disabled { opacity: 0.28; cursor: default; }
+.booth .bl-tool:focus-visible { outline: none; background: var(--on); color: var(--field); }
+.booth .bl-tools form + form:last-child { margin-top: 6px; }
+
+/* An empty scene: a dashed outline marked "cut here". */
+.booth .bl-empty {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr) 32px; grid-template-areas: "num text plus";
+  align-items: center; gap: 12px; padding: 18px 14px 16px;
+  border: 2px dashed var(--paper-2); color: var(--paper);
+}
+.bl-cut-here {
+  position: absolute; top: -12px; left: 18px; padding: 0 8px;
+  background: var(--ink); color: var(--paper-2); font-size: 14px; font-weight: 600; line-height: 22px; font-style: italic;
+}
+.booth .bl-empty .bl-num { color: transparent; -webkit-text-stroke: 2px var(--paper-2); align-self: center; }
+.booth .bl-empty .bl-text { text-decoration: none; }
+.bl-label { font-weight: 800; font-stretch: 85%; font-size: 21px; line-height: 1.1; }
+.bl-hint { color: var(--paper-2); font-size: 16px; line-height: 1.35; text-wrap: pretty; }
+.bl-plus { grid-area: plus; justify-self: end; color: var(--paper-2); transition: transform 200ms var(--ease-back), color 150ms; }
+.bl-plus svg { width: 28px; height: 28px; }
+.booth .bl-empty:hover { border-color: var(--paper); transform: rotate(0deg); }
+.booth .bl-empty:hover .bl-plus { color: var(--paper); transform: rotate(90deg) scale(1.15); }
+.booth .bl-empty:hover .bl-num { -webkit-text-stroke-color: var(--paper); }
+
+@media (min-width: 600px) {
+  .booth .bl-scene:not(.bl-empty) {
+    grid-template-columns: 76px clamp(150px, 26%, 230px) minmax(0, 1fr) 44px;
+    grid-template-areas: "num still text tools";
+    align-items: center; gap: 18px; padding: 16px 16px 16px 18px;
+  }
+  .booth .bl-num { font-size: 104px; align-self: center; }
+  .booth .bl-title { font-size: clamp(26px, 1rem + 1vw, 34px); }
+  .booth .bl-empty { grid-template-columns: 76px minmax(0, 1fr) 40px; padding: 22px 18px 20px; }
+}
+
+/* ---------- Cast */
+.bl-cast { margin-top: 28px; }
+.booth .bl-cast-btn {
+  min-height: 78px; font-size: clamp(21px, 1rem + 0.8vw, 27px); font-weight: 800; font-stretch: 85%; letter-spacing: -0.01em;
+}
+.booth .bl-cast-btn:hover:not(:disabled) { transform: translateY(-3px) rotate(-0.6deg); }
+.booth .bl-cast-btn:focus-visible { outline: none; background: var(--cut); color: var(--paper); border-color: var(--cut); }
+.booth .bl-cast-btn:disabled {
+  opacity: 1; background: transparent; color: var(--paper-2); border: 2px dashed var(--paper-2); clip-path: none;
+}
+.bl-cast-note { margin-top: 12px; color: var(--paper-2); font-size: 15px; }
+
+/* ---------- Counted: the last frame, in the number one's field */
+.bl-done { margin-bottom: 32px; padding: 28px 22px 26px; clip-path: var(--cut-a); }
+.bl-done-head { font-weight: 800; font-stretch: 78%; font-size: clamp(36px, 1rem + 3vw, 60px); line-height: 0.9; letter-spacing: -0.02em; text-wrap: balance; }
+.bl-done-sub { margin-top: 12px; color: var(--on-2); max-width: 44ch; }
+.bl-done-actions { margin-top: 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
+.bl-text-link { padding: 10px 2px; font-weight: 700; color: var(--on); text-decoration: underline; text-decoration-thickness: 2px; }
+.bl-text-link:hover { text-decoration-thickness: 4px; }
+
+/* ---------- The title sequence (about 2.8 s, then gone) */
+.bl-titles {
+  position: fixed; inset: 0; z-index: 50; overflow: hidden; cursor: pointer;
+  display: grid; place-items: center; text-align: center; color: var(--paper);
+  animation: bl-titles-ink 1ms linear 620ms both, bl-titles-out 320ms ease-in 2500ms forwards;
+}
+.bl-titles-bars { position: absolute; inset: 0; display: grid; grid-template-rows: repeat(5, 1fr); z-index: 2; }
+.bl-titles-bars span { transform: translateX(-101%); animation: bl-bar 1000ms var(--ease-out) both; }
+.bl-titles-bars .field-ink { background: var(--paper); }
+.bl-titles-bars span:nth-child(2) { animation-delay: 50ms; }
+.bl-titles-bars span:nth-child(3) { animation-delay: 100ms; }
+.bl-titles-bars span:nth-child(4) { animation-delay: 150ms; }
+.bl-titles-bars span:nth-child(5) { animation-delay: 200ms; }
+.bl-titles-roll {
+  grid-area: 1 / 1; display: grid; gap: 6px; padding-inline: var(--pad);
+  animation: bl-roll 1250ms cubic-bezier(.3, .1, .4, 1) 700ms both;
+}
+.bl-titles-roll li {
+  font-weight: 800; font-stretch: 78%; font-size: clamp(30px, 1rem + 3.6vw, 68px); line-height: 1; letter-spacing: -0.02em; text-wrap: balance;
+}
+.bl-titles-roll .num { color: var(--paper-2); margin-right: 0.3em; }
+.bl-titles-wrap {
+  grid-area: 1 / 1; z-index: 3; padding: 0.06em 0.24em 0.12em;
+  background: var(--paper); color: var(--ink);
+  font-weight: 800; font-stretch: 75%; font-size: clamp(54px, 1rem + 9vw, 160px); line-height: 1; letter-spacing: -0.025em;
+  animation: bl-wrap 480ms var(--ease-back) 1800ms both;
+}
+@keyframes bl-titles-ink { from { background-color: transparent; } to { background-color: var(--ink); } }
+@keyframes bl-titles-out { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+@keyframes bl-bar {
+  0% { transform: translateX(-101%); }
+  45%, 58% { transform: translateX(0); }
+  100% { transform: translateX(101%); }
+}
+@keyframes bl-roll {
+  0% { transform: translateY(45vh); opacity: 0; }
+  12% { opacity: 1; }
+  82% { opacity: 1; }
+  100% { transform: translateY(-30vh); opacity: 0; }
+}
+@keyframes bl-wrap {
+  from { transform: scale(1.6) rotate(-9deg); opacity: 0; }
+  to { transform: rotate(-2deg); opacity: 1; }
+}
+
+/* ---------- Search */
+.bl-search { position: relative; }
+.bl-search-icon { position: absolute; left: 18px; top: 50%; translate: 0 -50%; width: 26px; height: 26px; color: var(--ink); z-index: 1; pointer-events: none; stroke-width: 2.75; }
+.booth .bl-search input {
+  display: block; width: 100%; height: 68px; padding: 0 18px 0 58px; border: 0; border-radius: 0;
+  background: var(--paper); color: var(--ink); clip-path: var(--cut-c);
+  font: 650 22px/1 var(--font); font-stretch: 90%; -webkit-appearance: none; appearance: none;
+}
+.booth .bl-search input::placeholder { color: #55493f; opacity: 1; }
+.booth .bl-search input:focus-visible { outline: none; }
+.booth .bl-search input:disabled { opacity: 0.5; }
+.booth .bl-search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.bl-search::after {
+  content: ""; position: absolute; left: 2%; right: 0; bottom: -12px; height: 6px; background: var(--cut);
+  transform: scaleX(0); transform-origin: left; transition: transform 240ms var(--ease-out);
+}
+.bl-search:focus-within::after { transform: scaleX(1); }
+
+.bl-results { margin-top: 30px; transition: opacity 160ms; }
+.bl-results.htmx-request { opacity: 0.55; }
+.bl-results-hint { color: var(--paper-2); }
+
+.bl-start-head { font-size: 18px; font-weight: 700; color: var(--paper-2); }
+.bl-prompt {
+  margin-top: 8px; max-width: 24ch;
+  font-weight: 750; font-stretch: 82%; font-size: clamp(28px, 1rem + 1.5vw, 38px); line-height: 1.04; letter-spacing: -0.015em; text-wrap: balance;
+}
+.bl-start-sub { margin-top: 12px; font-size: 16px; color: var(--paper-2); }
+.bl-start .bl-hits { margin-top: 16px; }
+
+.bl-hits { display: grid; gap: 4px; margin-inline: -8px; }
+.booth .bl-hit {
+  width: 100%; display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 16px;
+  padding: 8px; border: 0; background: transparent; text-align: left;
+  transition: transform 180ms var(--ease-out), background-color 180ms;
+}
+.booth .bl-hit:hover:not(:disabled) { background: #221c17; transform: translateX(4px); }
+.booth .bl-hit:disabled { cursor: default; }
+.booth .bl-thumb { display: block; width: 56px; aspect-ratio: 2 / 3; }
+/* The poster is how people recognise a film in a list, so show it as printed. */
+.booth .bl-thumb.printed img { filter: none; mix-blend-mode: normal; opacity: 1; }
+.booth .bl-hit-text { display: flex; flex-direction: column; min-width: 0; }
+.booth .bl-hit-text strong { font-weight: 750; font-stretch: 88%; font-size: 19px; line-height: 1.15; }
+.booth .bl-hit .bl-year { color: var(--paper-2); }
+.bl-hit-add {
+  display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px 10px 12px;
+  background: var(--paper); color: var(--ink); font-weight: 750; font-size: 16px; line-height: 1;
+  clip-path: var(--cut-b); transition: transform 180ms var(--ease-back);
+}
+.bl-hit-add svg { width: 18px; height: 18px; stroke-width: 3; }
+.booth .bl-hit:hover .bl-hit-add { transform: rotate(-3deg) scale(1.06); }
+.booth .bl-hit:active .bl-hit-add { transform: scale(0.94); }
+.bl-hit-state { display: inline-flex; align-items: center; gap: 6px; color: var(--paper-2); font-weight: 650; font-size: 16px; white-space: nowrap; }
+.bl-hit-state svg { width: 20px; height: 20px; color: var(--cut); stroke-width: 3; }
+
+/* ---------- Motion: picking and reordering (view transitions, named per film) */
+::view-transition-group(.bl-scene) { animation-duration: 440ms; animation-timing-function: cubic-bezier(.3, 1.3, .5, 1); }
+::view-transition-new(.bl-scene):only-child { animation: bl-strip-in 480ms cubic-bezier(.3, 1.4, .5, 1) both; }
+::view-transition-old(.bl-scene):only-child { animation: bl-strip-out 260ms ease-in both; }
+@keyframes bl-strip-in { from { transform: translateX(-70px) rotate(-4deg); opacity: 0; } }
+@keyframes bl-strip-out { to { transform: translateX(90px) rotate(5deg); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bl-titles { display: none; }
+}

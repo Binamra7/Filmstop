@@ -38,7 +38,13 @@ type Details struct {
 	Runtime  int    // minutes
 	Genres   string // up to two, comma-separated
 	Detailed bool   // fetched from TMDB; false means fetch again
+	// Swatch is the poster's dominant colour as "#rrggbb", "none" when it has no
+	// poster or the poster couldn't be read, and "" until measured.
+	Swatch string
 }
+
+// Complete reports whether there is nothing left to fetch from TMDB.
+func (d Details) Complete() bool { return d.Detailed && d.Swatch != "" }
 
 // Ballot is five movie ids in rank order; 0 marks an empty slot.
 type Ballot [rank.Slots]int64
@@ -93,6 +99,7 @@ var migrations = []struct{ name, def string }{
 	{"runtime", "INTEGER NOT NULL DEFAULT 0"},
 	{"genres", "TEXT NOT NULL DEFAULT ''"},
 	{"detailed", "INTEGER NOT NULL DEFAULT 0"},
+	{"swatch", "TEXT NOT NULL DEFAULT ''"},
 }
 
 func migrate(db *sql.DB) error {
@@ -231,7 +238,7 @@ func (s *Store) Movies(ctx context.Context, ids []int64) (map[int64]Movie, error
 		args[i] = id
 	}
 	q := `SELECT id, title, year, poster_path, backdrop_path, overview,
-		tagline, director, runtime, genres, detailed FROM movies WHERE id IN (?` +
+		tagline, director, runtime, genres, detailed, swatch FROM movies WHERE id IN (?` +
 		strings.Repeat(",?", len(ids)-1) + `)`
 	rows, err := s.db.QueryContext(ctx, q, args...)
 	if err != nil {
@@ -241,7 +248,7 @@ func (s *Store) Movies(ctx context.Context, ids []int64) (map[int64]Movie, error
 	for rows.Next() {
 		var m Movie
 		if err := rows.Scan(&m.ID, &m.Title, &m.Year, &m.PosterPath, &m.BackdropPath, &m.Overview,
-			&m.Tagline, &m.Director, &m.Runtime, &m.Genres, &m.Detailed); err != nil {
+			&m.Tagline, &m.Director, &m.Runtime, &m.Genres, &m.Detailed, &m.Swatch); err != nil {
 			return nil, err
 		}
 		out[m.ID] = m
@@ -258,9 +265,10 @@ func (s *Store) SetDetails(ctx context.Context, id int64, backdrop, poster strin
 		detailed = 1
 	}
 	_, err := s.db.ExecContext(ctx, `UPDATE movies SET tagline = ?, director = ?, runtime = ?, genres = ?, detailed = ?,
+		swatch = CASE WHEN ? = '' THEN swatch ELSE ? END,
 		backdrop_path = CASE WHEN ? = '' THEN backdrop_path ELSE ? END,
 		poster_path = CASE WHEN ? = '' THEN poster_path ELSE ? END WHERE id = ?`,
-		d.Tagline, d.Director, d.Runtime, d.Genres, detailed, backdrop, backdrop, poster, poster, id)
+		d.Tagline, d.Director, d.Runtime, d.Genres, detailed, d.Swatch, d.Swatch, backdrop, backdrop, poster, poster, id)
 	return err
 }
 

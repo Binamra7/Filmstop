@@ -2,56 +2,64 @@
 {{$b := .Board}}
 {{if $b.Entries}}
 {{$top := $b.Top}}{{$one := index $top 0}}
-<section class="opening" aria-labelledby="one-title">
-  <div class="opening-still">
-    {{with $one.BackdropPath}}
-    <img src="{{poster . "w1280"}}" srcset="{{poster . "w780"}} 780w, {{poster . "w1280"}} 1280w, {{poster . "original"}} 1920w" sizes="100vw" width="1280" height="720" alt="" fetchpriority="high" decoding="async">
-    {{else}}{{with $one.PosterPath}}<img class="from-poster" src="{{poster . "w780"}}" width="780" height="1170" alt="" fetchpriority="high" decoding="async">{{end}}{{end}}
-  </div>
-  <div class="title-card">
-    <p class="kicker">Number one, as voted by {{num $b.Voters}} {{plural $b.Voters "person" "people"}}</p>
-    <h1 id="one-title" class="film-title"><a class="pn-title-link" href="/film/{{$one.MovieID}}">{{$one.Title}}</a></h1>
-    <p class="credit">{{template "credit" $one.Movie}}</p>
-    {{if $one.Tagline}}<p class="tagline">“{{$one.Tagline}}”</p>{{else if $one.Overview}}<p class="logline">{{$one.Overview}}</p>{{end}}
-  </div>
-</section>
-
-<section class="wrap verdict" aria-label="How voters ranked it">
-  <div class="verdict-stat">
-    <p><strong>{{num $one.Points}}</strong> points</p>
-    <p class="muted">On {{num $one.Ballots}} {{plural $one.Ballots "ballot" "ballots"}}, and first on {{num $one.Firsts}} of them</p>
-  </div>
-  <div class="spread" role="img" aria-label="Where voters placed it: {{range $i, $n := $one.ByPos}}{{if $i}}, {{end}}{{$n}} at number {{add $i 1}}{{end}}">
-    {{range spread $one.ByPos}}
-    <div class="spread-col">
-      <span class="spread-bar"><span style="height: {{.Pct}}%"></span></span>
-      <span class="spread-label">#{{.Pos}} <b>{{.N}}</b></span>
+<section class="opening field-{{field $one.Swatch $one.MovieID}}" aria-labelledby="one-title">
+  <div class="sweep" aria-hidden="true"><span></span><span></span><span></span></div>
+  <span class="op-bars" aria-hidden="true"><span class="bar"></span><span class="bar"></span><span class="bar"></span></span>
+  <div class="op-inner">
+    <a class="op-still reveal" href="/film/{{$one.MovieID}}" tabindex="-1" aria-hidden="true">
+      <span class="printed cut-a">
+      {{with $one.BackdropPath}}
+      <img src="{{poster . "w1280"}}" srcset="{{poster . "w780"}} 780w, {{poster . "w1280"}} 1280w, {{poster . "original"}} 1920w" sizes="(min-width: 900px) 60vw, 100vw" width="1280" height="720" alt="" fetchpriority="high" decoding="async">
+      {{else}}{{with $one.PosterPath}}<img src="{{poster . "w780"}}" width="780" height="1170" alt="" fetchpriority="high" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}
+      </span>
+    </a>
+    <div class="op-card">
+      <p class="kicker op-kicker"><span class="op-one num" aria-hidden="true">1</span>Number one, as voted by {{num $b.Voters}} {{plural $b.Voters "person" "people"}}</p>
+      <h1 id="one-title" class="film-title op-title"><span class="pasted"><a class="strip pn-title-link" href="/film/{{$one.MovieID}}">{{$one.Title}}</a></span></h1>
+      <p class="credit op-credit">{{template "credit" $one.Movie}}</p>
+      {{if $one.Tagline}}<p class="tagline op-tagline">“{{$one.Tagline}}”</p>{{else if $one.Overview}}<p class="logline op-logline">{{$one.Overview}}</p>{{end}}
     </div>
-    {{end}}
-  </div>
-  <div class="verdict-actions">
-    <a class="btn btn-primary" href="/ballot">{{if .Cast}}Change your five{{else}}Pick your five{{end}}</a>
+    <div class="verdict" aria-label="How voters ranked it" role="group">
+      <div class="verdict-stat">
+        <p class="verdict-points"><strong class="num">{{num $one.Points}}</strong> points</p>
+        <p class="verdict-ballots">On {{num $one.Ballots}} {{plural $one.Ballots "ballot" "ballots"}}, and first on {{num $one.Firsts}} of them</p>
+      </div>
+      <div class="spread" role="img" aria-label="Where voters placed it: {{range $i, $n := $one.ByPos}}{{if $i}}, {{end}}{{$n}} at number {{add $i 1}}{{end}}">
+        {{range spread $one.ByPos}}
+        <div class="spread-col">
+          <span class="spread-bar"><span style="height: {{.Pct}}%"></span></span>
+          <span class="spread-label"><span class="spread-pos">#{{.Pos}}</span> <b class="num">{{.N}}</b></span>
+        </div>
+        {{end}}
+      </div>
+      <div class="verdict-actions">
+        <a class="btn btn-primary" href="/ballot">{{if .Cast}}Change your five{{else}}Pick your five{{end}}</a>
+      </div>
+    </div>
   </div>
 </section>
 
 {{if gt (len $top) 1}}
-<section class="wrap scenes" aria-labelledby="scenes-head">
-  <div class="section-head">
+<section class="scenes" aria-labelledby="scenes-head">
+  <div class="wrap section-head">
     <h2 id="scenes-head" class="section-title">Two to five</h2>
     <p class="muted">Counted from {{num $b.Voters}} {{plural $b.Voters "ballot" "ballots"}} · updated {{ago $b.At}}</p>
   </div>
   <ol class="scene-grid">
     {{range $i, $e := $top}}{{if $i}}
-    <li class="scene">
-      <div class="scene-still">
-        {{with .BackdropPath}}<img src="{{poster . "w780"}}" srcset="{{poster . "w300"}} 300w, {{poster . "w780"}} 780w" sizes="(min-width: 860px) 46vw, 100vw" width="780" height="439" alt="" loading="lazy" decoding="async">
-        {{else}}{{with $e.PosterPath}}<img class="from-poster" src="{{poster . "w500"}}" width="500" height="750" alt="" loading="lazy" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}
-        <span class="scene-num" aria-hidden="true">{{.Place}}</span>
+    <li class="scene reveal field-{{field .Swatch .MovieID}}">
+      <div class="scene-top" aria-hidden="true">
+        <span class="scene-num num">{{.Place}}</span>
+        <span class="scene-disc disc"></span>
       </div>
-      <h3 class="film-title"><a class="pn-title-link pn-stretch" href="/film/{{.MovieID}}"><span class="visually-hidden">Number {{.Place}}: </span>{{.Title}}</a></h3>
+      <div class="scene-still printed cut-{{if eq $i 2}}c{{else if eq $i 3}}a{{else}}b{{end}}">
+        {{with .BackdropPath}}<img src="{{poster . "w780"}}" srcset="{{poster . "w300"}} 300w, {{poster . "w780"}} 780w" sizes="(min-width: 1100px) 25vw, (min-width: 600px) 50vw, 100vw" width="780" height="439" alt="" loading="lazy" decoding="async">
+        {{else}}{{with $e.PosterPath}}<img src="{{poster . "w500"}}" width="500" height="750" alt="" loading="lazy" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}
+      </div>
+      <span class="scene-bar bar" aria-hidden="true"></span>
+      <h3 class="film-title scene-title"><a class="pn-title-link pn-stretch" href="/film/{{.MovieID}}"><span class="visually-hidden">Number {{.Place}}: </span>{{.Title}}</a></h3>
       <p class="credit">{{template "credit" .Movie}}</p>
-      {{if .Tagline}}<p class="tagline small-tagline">“{{.Tagline}}”</p>{{end}}
-      <p class="scene-points"><strong>{{num .Points}}</strong> points · {{num .Ballots}} {{plural .Ballots "ballot" "ballots"}}{{if .Firsts}}, first on {{num .Firsts}}{{end}}</p>
+      <p class="scene-points"><strong class="num">{{num .Points}}</strong> points · {{num .Ballots}} {{plural .Ballots "ballot" "ballots"}}{{if .Firsts}}, first on {{num .Firsts}}{{end}}</p>
     </li>
     {{end}}{{end}}
   </ol>
@@ -97,6 +105,7 @@
 
 {{with $b.Rest}}
 <section class="credits" aria-labelledby="credits-head">
+  <span class="credits-bar" aria-hidden="true"></span>
   <h2 id="credits-head" class="section-title">Also starring</h2>
   <p class="muted credits-sub">Places six to {{add 5 (len .)}}, in order of appearance</p>
   <ol class="roll">
@@ -111,11 +120,16 @@
 {{end}}
 
 {{else}}
-<section class="wrap empty">
-  <p class="kicker">Fade in</p>
-  <h1 class="film-title">No ballots yet</h1>
-  <p class="logline">Filmstop ranks the films people love most. The screen is still dark. Pick your five favourites, in order, and yours will be the first scene anyone sees.</p>
-  <a class="btn btn-primary" href="/ballot">Pick your five</a>
+<section class="empty field-ink">
+  <div class="sweep" aria-hidden="true"><span></span><span></span><span></span></div>
+  <span class="empty-disc disc" aria-hidden="true"></span>
+  <span class="op-bars empty-bars" aria-hidden="true"><span class="bar"></span><span class="bar"></span><span class="bar"></span></span>
+  <div class="wrap empty-card">
+    <p class="kicker">Fade in</p>
+    <h1 class="film-title empty-title"><span class="pasted"><span class="strip">No ballots yet</span></span></h1>
+    <p class="logline">Filmstop ranks the films people love most. The screen is still dark. Pick your five favourites, in order, and yours will be the first scene anyone sees.</p>
+    <a class="btn btn-primary" href="/ballot">Pick your five</a>
+  </div>
 </section>
 {{end}}
 {{end}}

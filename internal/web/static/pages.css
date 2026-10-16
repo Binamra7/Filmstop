@@ -1,0 +1,67 @@
+/* How it works (/method) and the not-found title card. Scoped under
+   .method-page and .nf-page. */
+
+/* ---------- How it works */
+.method-page { padding-bottom: 24px; }
+.method-page .mp-head { position: relative; isolation: isolate; overflow: clip; padding-top: 48px; padding-bottom: 72px; }
+.method-page .mp-title { font-size: clamp(56px, 9vw + 12px, 168px); max-width: 9ch; }
+.method-page .mp-lede { margin-top: 28px; max-width: 34ch; font-size: clamp(21px, 0.9rem + 0.9vw, 28px); line-height: 1.4; font-weight: 500; }
+.method-page .mp-mark { display: none; }
+
+.method-page .mp-rule, .method-page .mp-why, .method-page .mp-keep { display: grid; gap: 24px; }
+.method-page .mp-rule { padding-top: 24px; padding-bottom: 88px; }
+.method-page .mp-side { display: grid; gap: 16px; align-content: start; }
+.method-page .mp-side p { font-size: 19px; color: var(--on-2); max-width: 34ch; }
+.method-page .mp-prose { display: grid; gap: 18px; max-width: 62ch; font-size: 18px; line-height: 1.65; color: var(--on-2); }
+.method-page .mp-prose strong { color: var(--on); font-weight: 750; }
+.method-page .mp-punch { color: var(--on); font-size: 22px; line-height: 1.45; font-weight: 600; }
+
+/* The points scale as cut bars, shortening from five to one. */
+.method-page .mp-points { width: 100%; border-collapse: collapse; }
+.method-page .mp-points thead th { padding-bottom: 14px; line-height: 1.25; font-size: 16px; font-weight: 650; color: var(--on-2); text-align: left; }
+.method-page .mp-points thead .c-n { padding-left: 18px; }
+.method-page .mp-points td { padding: 5px 0; vertical-align: middle; }
+.method-page .mp-points td:first-child { width: 3.4em; font-size: 22px; font-weight: 750; font-stretch: 85%; }
+.method-page .mp-points .c-n { display: flex; align-items: center; gap: 16px; }
+.method-page .mp-bar {
+  display: block; height: clamp(40px, 4vw, 56px); width: calc(var(--n) * 17%);
+  background: var(--cut); clip-path: var(--cut-c); transform-origin: left;
+  animation: mp-grow 640ms var(--ease-out) both; animation-delay: calc((5 - var(--n)) * 80ms + 120ms);
+}
+.method-page .mp-points tr:nth-child(even) .mp-bar { background: var(--paper); clip-path: var(--cut-a); }
+.method-page .mp-points .num { font-size: clamp(40px, 3vw + 16px, 64px); line-height: 1; }
+@keyframes mp-grow { from { transform: scaleX(0); } }
+.method-page .mp-after { margin-top: 28px; max-width: 56ch; font-size: 18px; color: var(--on-2); }
+
+.method-page .mp-paper {
+  --field: var(--paper); --on: var(--ink); --on-2: #4a4038; --shape: var(--cut);
+  background: var(--field); color: var(--on); padding: 72px 0 80px;
+}
+.method-page .mp-keep { padding-top: 80px; }
+
+@media (min-width: 900px) {
+  .method-page .mp-head { padding-top: 72px; padding-bottom: 112px; }
+  .method-page .mp-mark { display: block; position: absolute; z-index: -1; right: var(--pad); top: 56px; width: min(30vw, 420px); height: auto; }
+  .method-page .mp-rule, .method-page .mp-why, .method-page .mp-keep { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+  .method-page .mp-side { grid-column: 1 / 5; }
+  .method-page .mp-main { grid-column: 6 / 13; }
+  .method-page .mp-paper { padding: 104px 0 112px; }
+  .method-page .mp-keep { padding-top: 104px; }
+}
+
+/* ---------- Not found: a title card */
+.nf-page {
+  position: relative; overflow: hidden; isolation: isolate;
+  padding: 56px 0 250px;
+}
+.nf-page .nf-mark { position: absolute; z-index: -1; width: 300px; right: -70px; bottom: -70px; }
+.nf-page .nf-card { display: grid; gap: 22px; justify-items: start; }
+.nf-page .kicker { font-size: 22px; font-weight: 800; }
+.nf-page .nf-title { margin-bottom: 8px; font-size: clamp(64px, 13vw + 8px, 200px); line-height: 1.02; }
+.nf-page .nf-title .pasted { animation: drop-in 520ms var(--ease-back) 620ms both; }
+.nf-page .nf-line { max-width: 30ch; font-size: clamp(20px, 0.9rem + 0.7vw, 26px); line-height: 1.4; font-weight: 550; }
+.nf-page .btn { min-height: 56px; padding-inline: 28px; }
+@media (min-width: 900px) {
+  .nf-page { min-height: min(78svh, 720px); display: flex; align-items: center; padding: 56px 0 72px; }
+  .nf-page .nf-mark { right: 6vw; bottom: auto; top: 50%; transform: translateY(-50%); width: 34vw; }
+}

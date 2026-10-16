@@ -1,59 +1,116 @@
-/* Your five: the shareable programme card (/five/:code). */
-.f5-opening .opening-still { max-height: 74vh; }
-@media (min-width: 860px) { .f5-opening .opening-still { aspect-ratio: 2.39 / 1; } }
+/* Your five (/five/:code): the shareable poster. Number one fills the first
+   screen in its own field, two to five follow as tiles in theirs, then the
+   reading. Everything is scoped under .five-page. */
 
-.f5-name { font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 600; color: var(--text); font-size: 1.04em; }
+/* ---------- Number one */
+.five-page .f5-hero { position: relative; overflow: hidden; isolation: isolate; padding: 28px 0 40px; }
+.five-page .f5-hero-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 14px; align-items: end; }
+.five-page .f5-kicker { grid-column: 1 / -1; font-size: 20px; font-weight: 750; margin-bottom: 14px; }
+.five-page .f5-big {
+  grid-column: 1; grid-row: 2; align-self: start;
+  font-size: 150px; line-height: 0.72; color: var(--on); margin-left: -0.04em;
+}
+.five-page .f5-one-still { grid-column: 2; grid-row: 2; position: relative; z-index: 1; }
+.five-page .f5-one-still .printed { aspect-ratio: 4 / 3; transition: transform 220ms var(--ease-out); }
+.five-page .f5-one-still:hover .printed { transform: translate(4px, -4px); }
+.five-page .from-poster { object-position: 50% 22%; }
+.five-page .f5-title {
+  grid-column: 1 / -1; grid-row: 3; position: relative; z-index: 2; margin-top: -0.5em;
+  font-size: clamp(52px, 14vw, 168px); line-height: 1.02;
+}
+.five-page .f5-title.is-mid { font-size: clamp(48px, 8.4vw + 6px, 128px); }
+.five-page .f5-title.is-long { font-size: clamp(36px, 6.4vw + 10px, 104px); }
+.five-page .f5-title .pasted { max-width: 100%; animation: drop-in 520ms var(--ease-back) 620ms both; }
+.five-page .f5-title .strip { padding-inline: 0.14em; }
+.five-page .f5-credit { grid-column: 1 / -1; grid-row: 4; margin-top: 20px; font-size: 17px; }
 
-/* The billing line and the actions */
-.f5-bill { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 48px; padding-top: 28px; padding-bottom: 56px; }
-.f5-billing { max-width: 60ch; font-size: 19px; line-height: 1.5; color: var(--text-2); }
-.f5-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
-.f5-quiet { border-color: var(--line-strong); color: var(--text); }
-.f5-quiet:hover { background: var(--hover); border-color: var(--text-2); }
-.f5-copied { flex-basis: 100%; min-height: 0; font-size: 15px; color: var(--text-2); }
-.f5-copied:empty { display: none; }
-.f5-url {
-  flex-basis: 100%; height: 48px; padding: 0 14px; font: inherit; font-size: 16px; color: var(--text);
-  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius);
+@media (min-width: 900px) {
+  .five-page .f5-hero { min-height: calc(100svh - 80px); display: flex; align-items: center; padding: 40px 0 56px; }
+  .five-page .f5-hero-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+  .five-page .f5-kicker { grid-column: 1 / 4; grid-row: 1; align-self: start; font-size: 24px; margin: 0; }
+  .five-page .f5-big { grid-column: 1 / 4; grid-row: 1 / 3; align-self: center; font-size: clamp(240px, 24vw, 400px); line-height: 0.74; margin-top: 0.12em; }
+  .five-page .f5-one-still { grid-column: 4 / 13; grid-row: 1 / 3; }
+  .five-page .f5-one-still .printed { aspect-ratio: 16 / 8; }
+  .five-page .f5-title { grid-column: 1 / 12; margin-top: -0.42em; }
+  .five-page .f5-credit { grid-column: 1 / 9; font-size: 18px; margin-top: 24px; }
+}
+
+/* ---------- Two to five: tiles, each in its own field */
+.five-page .f5-strip-wrap { padding-top: 16px; }
+.five-page .f5-strip { display: grid; gap: 10px; }
+.five-page .f5-scene {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr) 104px; gap: 12px; align-items: center;
+  padding: 14px 14px 14px 16px; clip-path: var(--cut-c);
+  transition: transform 200ms var(--ease-out);
+}
+.five-page .f5-scene:nth-child(even) { margin-left: 14px; clip-path: var(--cut-a); }
+.five-page .f5-scene:nth-child(odd) { margin-right: 14px; }
+/* An ink tile on the black page is printed a step lighter so it reads as its own sheet (paper 13:1, ink 2 7.5:1). */
+.five-page .f5-num { font-size: 68px; line-height: 0.8; color: var(--on); }
+.five-page .f5-still { grid-column: 3; grid-row: 1; aspect-ratio: 1; transition: transform 200ms var(--ease-out); }
+.five-page .f5-text { grid-column: 2; grid-row: 1; display: grid; gap: 4px; min-width: 0; }
+.five-page .f5-text .film-title { font-size: 24px; line-height: 0.95; overflow-wrap: anywhere; }
+.five-page .f5-text .credit { font-size: 15px; }
+.five-page .f5-place { font-size: 15px; font-weight: 650; }
+.five-page .f5-scene:hover { transform: translateY(-3px); }
+.five-page .f5-scene:hover .f5-still { transform: translate(3px, -3px); }
+
+@media (min-width: 700px) {
+  .five-page .f5-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .five-page .f5-scene, .five-page .f5-scene:nth-child(n) {
+    margin: 0; grid-template-columns: 1fr; align-content: start; gap: 16px; padding: 18px 20px 26px;
+  }
+  .five-page .f5-num { grid-row: 1; font-size: clamp(96px, 8vw, 132px); }
+  .five-page .f5-still { grid-column: 1; grid-row: 2; aspect-ratio: 4 / 3; }
+  .five-page .f5-text { grid-column: 1; grid-row: 3; gap: 6px; }
+  .five-page .f5-text .film-title { font-size: clamp(28px, 1rem + 1.2vw, 38px); }
+}
+@media (min-width: 1100px) {
+  .five-page .f5-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .five-page .f5-scene:nth-child(even) { transform: translateY(36px); }
+  .five-page .f5-scene:nth-child(even):hover { transform: translateY(33px); }
+}
+
+/* ---------- The billing line and the actions */
+.five-page .f5-bill { display: grid; gap: 28px; padding-top: 64px; padding-bottom: 80px; }
+.five-page .f5-billing {
+  font-size: clamp(24px, 1rem + 1.6vw, 40px); line-height: 1.25; font-weight: 500; color: var(--on-2);
+  max-width: 34ch; text-wrap: pretty;
+}
+.five-page .f5-name { font-weight: 800; font-stretch: 82%; color: var(--on); letter-spacing: -0.01em; }
+.five-page .f5-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.five-page .f5-quiet { color: var(--on); }
+.five-page .f5-copied { flex-basis: 100%; font-size: 16px; color: var(--on-2); }
+.five-page .f5-copied:empty { display: none; }
+.five-page .f5-url {
+  flex-basis: 100%; height: 52px; padding: 0 14px; font: inherit; font-size: 17px;
+  color: var(--ink); background: var(--paper); border: 0; clip-path: var(--cut-c);
 }
 @media (max-width: 599px) {
-  .f5-actions { width: 100%; }
-  .f5-actions .btn { flex: 1 1 0; }
+  .five-page .f5-actions .btn { flex: 1 1 0; }
+}
+@media (min-width: 1100px) {
+  .five-page .f5-bill { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: 48px; align-items: end; padding-top: 112px; }
+  .five-page .f5-actions { justify-content: flex-end; }
 }
 
-/* Scenes two to five, as a strip */
-.f5-strip-wrap { padding-bottom: 88px; }
-.f5-strip { display: grid; gap: 40px 24px; }
-@media (min-width: 600px) { .f5-strip { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 1100px) { .f5-strip { grid-template-columns: repeat(4, 1fr); } }
-.f5-still img { transition: transform 500ms cubic-bezier(.2, .6, .2, 1); }
-@media (prefers-reduced-motion: no-preference) { .f5-scene:hover .f5-still img { transform: scale(1.03); } }
-.f5-num {
-  position: absolute; left: 14px; bottom: 2px; z-index: 1;
-  font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 500; line-height: 1;
-  font-size: clamp(56px, 4vw + 24px, 84px);
+/* ---------- The reading, on paper */
+.five-page .f5-reading {
+  --field: var(--paper); --on: var(--ink); --on-2: #4a4038; --shape: var(--cut);
+  background: var(--field); color: var(--on); padding: 64px 0 80px;
 }
-.f5-text .film-title { margin-top: 16px; font-size: clamp(24px, 1rem + 0.8vw, 30px); }
-.f5-text .credit { margin-top: 6px; }
-.f5-place { margin-top: 8px; font-size: 15px; color: var(--text-2); }
-@media (max-width: 599px) {
-  .f5-strip { gap: 18px; }
-  .f5-scene { display: grid; grid-template-columns: 136px minmax(0, 1fr); gap: 14px; align-items: center; }
-  .f5-num { left: 9px; font-size: 44px; }
-  .f5-text .film-title { margin-top: 0; font-size: 21px; }
-  .f5-text .credit { margin-top: 2px; font-size: 15px; }
-  .f5-place { margin-top: 2px; }
-}
-
-/* The reading */
-.f5-reading { display: grid; gap: 24px 64px; padding-top: 40px; padding-bottom: 104px; border-top: 1px solid var(--line); }
-.f5-reading-head .section-title { font-size: 20px; font-family: var(--sans); font-variation-settings: normal; font-weight: 600; letter-spacing: 0; color: var(--text-2); }
-.f5-headline { margin-top: 12px; font-size: clamp(36px, 1.2rem + 2.6vw, 60px); max-width: 14ch; }
-.f5-prose { display: grid; gap: 18px; max-width: 62ch; font-size: 19px; line-height: 1.6; }
-.f5-prose p:first-child { font-size: 22px; line-height: 1.5; }
-.f5-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 18px; }
-.f5-link { color: var(--text-2); font-size: 16px; font-weight: 500; }
-.f5-link:hover { color: var(--text); }
+.five-page .f5-reading-grid { display: grid; gap: 36px; }
+.five-page .f5-reading-title { font-size: 22px; font-weight: 750; line-height: 1.2; }
+.five-page .f5-headline { margin-top: 14px; font-size: clamp(52px, 6.6vw + 12px, 120px); max-width: 9ch; line-height: 0.86; }
+.five-page .f5-reading-bar { margin-top: 28px; width: min(320px, 70%); height: 22px; clip-path: var(--cut-c); }
+.five-page .f5-prose { display: grid; gap: 20px; max-width: 58ch; font-size: 19px; line-height: 1.6; color: var(--on-2); }
+.five-page .f5-prose p:first-child { font-size: 23px; line-height: 1.45; color: var(--on); font-weight: 500; }
+.five-page .f5-prose .f5-name { font-stretch: 85%; }
+.five-page .f5-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin-top: 16px; }
+.five-page .f5-link { color: var(--on); font-size: 17px; font-weight: 650; }
 @media (min-width: 980px) {
-  .f5-reading { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); padding-top: 56px; }
+  .five-page .f5-reading { padding: 104px 0 120px; }
+  .five-page .f5-reading-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+  .five-page .f5-reading-head { grid-column: 1 / 7; }
+  .five-page .f5-prose { grid-column: 7 / 13; padding-top: 40px; }
 }

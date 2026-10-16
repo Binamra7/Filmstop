@@ -1,8 +1,12 @@
 {{define "content"}}
-<section class="wrap empty">
-  <p class="kicker">404</p>
-  <h1 class="film-title">This reel is missing</h1>
-  <p class="logline">The page you asked for isn’t showing here.</p>
-  <a class="btn btn-primary" href="/">Back to the list</a>
+<section class="nf-page field-mustard" aria-labelledby="nf-title">
+  <div class="sweep" aria-hidden="true"><span></span><span></span><span></span></div>
+  <svg class="nf-mark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="var(--shape)" stroke="none"/><path d="M-6 60L106 36v20L-6 80z" fill="var(--field)" stroke="none"/></svg>
+  <div class="wrap nf-card">
+    <p class="kicker">404</p>
+    <h1 id="nf-title" class="film-title nf-title"><span class="pasted"><span class="strip">Not found</span></span></h1>
+    <p class="nf-line">This reel is missing. The page you asked for isn’t showing here; maybe it was cut in the edit.</p>
+    <a class="btn btn-primary" href="/">Back to the list</a>
+  </div>
 </section>
 {{end}}
