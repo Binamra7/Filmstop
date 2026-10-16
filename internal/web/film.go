@@ -48,7 +48,7 @@ func (s *Server) film(c *gin.Context) {
 		s.filmNotFound(c)
 		return
 	}
-	if !m.Detailed && s.tmdb.Enabled() {
+	if !m.Complete() && s.tmdb.Enabled() {
 		s.fillDetails(c, &m)
 	}
 

@@ -1,16 +1,17 @@
 {{define "content"}}
 <section class="wrap booth" hx-include="#q">
-  <div class="booth-intro">
-    <h1 class="film-title">Storyboard your five</h1>
-    <p class="logline">Five films, best first. Not the most important films ever made: the ones that made you.</p>
+  <div class="bl-intro">
+    <h1 class="bl-h1 film-title">Storyboard your five</h1>
+    <p class="bl-logline">Five films, best first. Not the most important films ever made: the ones that made you.</p>
+    <span class="bl-disc disc" aria-hidden="true"></span>
   </div>
-  <div class="booth-board">
+  <div class="bl-board-col">
     {{template "ballot-panel" .Ballot}}
   </div>
-  <div class="booth-search">
-    <form class="search" action="/ballot" method="get" role="search">
+  <div class="bl-search-col">
+    <form class="bl-search" action="/ballot" method="get" role="search">
       <label for="q" class="visually-hidden">Search films</label>
-      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <svg class="bl-search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
       <input id="q" name="q" type="search" value="{{.Results.Query}}" autocomplete="off" spellcheck="false"
         placeholder="Search for a film"
         {{if not .Search}}disabled{{end}}
@@ -26,5 +27,10 @@
 document.addEventListener("click", e => {
   if (e.target.closest('a[href="#q"]')) { e.preventDefault(); const q = document.getElementById("q"); q.focus(); q.scrollIntoView({ block: "center", behavior: "smooth" }); }
 });
+// The title sequence after casting: a click or any key skips it, and it removes itself when it ends.
+const skipTitles = () => document.querySelectorAll(".bl-titles").forEach(t => t.remove());
+document.addEventListener("click", e => { if (e.target.closest(".bl-titles")) skipTitles(); });
+document.addEventListener("keydown", () => { if (document.querySelector(".bl-titles")) skipTitles(); });
+document.addEventListener("animationend", e => { if (e.animationName === "bl-titles-out") skipTitles(); });
 </script>
 {{end}}

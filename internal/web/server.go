@@ -187,6 +187,7 @@ func (s *Server) loadPages() (map[string]*template.Template, error) {
 	}
 	f := template.FuncMap{
 		"css":    func() template.CSS { return template.CSS(css) },
+		"field":  fieldOf,
 		"static": func(name string) string { return "/static/" + name + "?v=" + s.static[name].hash },
 	}
 	// Shared blocks: the layout and every partials*.html. Every other template

@@ -184,5 +184,6 @@ func (c *Client) Details(ctx context.Context, id int64) (backdrop, poster string
 	}
 	d.Director = strings.Join(directors, " & ")
 	d.Genres = strings.Join(genres, ", ")
+	d.Swatch = c.swatch(ctx, body.Poster)
 	return body.Backdrop, body.Poster, d, nil
 }

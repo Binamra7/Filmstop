@@ -1,57 +1,240 @@
-/* Home: linked titles and the programme notes. Inlined after site.css. */
+/* The list (/): an opening title sequence for number one, four poster tiles for
+   two to five, the programme notes, and the end credits. Read docs/DESIGN.md.
+   Everything here is scoped under .page-list (the list page's body class). */
 
-/* Titles link to their film, but still read as titles until you point at them. */
-.pn-title-link { text-decoration: none; }
-.pn-title-link:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.12em; }
-/* A scene or credit line is one target: the title's link covers the whole item. */
-.scene, .roll li { position: relative; }
-.pn-stretch::after { content: ""; position: absolute; inset: 0; z-index: 2; }
-.scene:hover .film-title a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.12em; }
-.roll li:hover .roll-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
-.pn-stretch:focus-visible { outline: none; }
-.pn-stretch:focus-visible::after { outline: 2px solid var(--text); outline-offset: 6px; border-radius: var(--radius); }
+/* Titles link to their film but read as titles until pointed at. */
+.page-list .pn-title-link { text-decoration: none; }
+.page-list .scene, .page-list .roll li { position: relative; }
+.page-list .pn-stretch::after { content: ""; position: absolute; inset: 0; z-index: 3; }
+.page-list .pn-stretch:focus-visible { outline: none; }
+.page-list .pn-stretch:focus-visible::after { outline: 3px solid var(--on); outline-offset: -8px; }
 
-/* Programme notes: printed like the notes in a cinema programme, a heading in
-   the title-card voice and the note set in sentences beside it. */
-.pn { padding-bottom: 96px; }
-.pn-body { display: grid; gap: 56px; }
-@media (min-width: 980px) {
-  .pn-body { grid-template-columns: minmax(0, 1fr) 340px; column-gap: 72px; align-items: start; }
-  .pn-only-latest { grid-template-columns: minmax(0, 720px); }
+/* ================= The opening: number one fills the first screen ======== */
+.page-list .opening {
+  /* The sheet is cut at the strip's own angle (2deg), so the black header
+     reads as the cinema and the field as the first frame of the film. */
+  --slant: 3.5vw;
+  position: relative; overflow: hidden; isolation: isolate;
+  min-height: calc(100svh - 70px);
+  padding: calc(var(--slant) + 28px) 0 56px;
+  clip-path: polygon(0 var(--slant), 100% 0, 100% 100%, 0 100%);
+}
+.page-list .op-inner {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 1320px; margin-inline: auto; padding-inline: var(--pad);
+  display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 18px;
+}
+.page-list .op-card { display: contents; }
+
+/* Bass shapes behind the cut still: a disc and three bars bleeding off the edge. */
+.page-list .op-still::before {
+  content: ""; position: absolute; z-index: -1; width: 46%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--shape); right: -16%; top: -12%;
+  transition: transform 240ms var(--ease-out);
+}
+.page-list .op-bars {
+  position: absolute; z-index: 1; right: 0; display: grid; justify-items: end; gap: 12px;
+  top: 52%; width: 40%;
+}
+.page-list .op-bars .bar { height: 20px; }
+.page-list .op-bars .bar:nth-child(1) { width: 62%; }
+.page-list .op-bars .bar:nth-child(2) { width: 100%; height: 30px; }
+.page-list .op-bars .bar:nth-child(3) { width: 38%; }
+
+.page-list .op-kicker { display: flex; align-items: flex-end; gap: 14px; font-size: 18px; line-height: 1.25; max-width: 30ch; }
+.page-list .op-one {
+  font-size: clamp(110px, 4rem + 14vw, 300px); line-height: 0.74; color: var(--on);
+  margin-bottom: -0.04em; flex: none;
 }
 
-.pn-notes { display: grid; }
-.pn-note { display: grid; gap: 6px; padding: 22px 0; border-bottom: 1px solid var(--line); }
-.pn-note:first-child { padding-top: 4px; }
-.pn-note:last-child { border-bottom: 0; }
+.page-list .op-still { display: block; position: relative; z-index: 2; isolation: isolate; }
+.page-list .op-still .printed { display: block; aspect-ratio: 16 / 10; transition: transform 240ms var(--ease-out); }
+.page-list .op-still:hover .printed { transform: translate(-4px, -3px); }
+.page-list .opening:hover .op-still::before { transform: translate(-8px, 6px); }
+
+.page-list .op-title {
+  position: relative; z-index: 3;
+  font-size: clamp(54px, 1.5rem + 7.6vw, 150px);
+  margin-top: -0.42em; padding-left: 4px;
+}
+.page-list .op-title .pasted { animation: drop-in 560ms var(--ease-back) 640ms both; }
+.page-list .op-title .strip { line-height: 1.04; padding: 0.02em 0.16em 0.08em; }
+.page-list .op-title a:hover { text-decoration: underline; text-decoration-thickness: 0.06em; text-underline-offset: 0.08em; text-decoration-color: var(--cut); }
+.page-list .op-credit { font-size: 18px; color: var(--on); font-weight: 650; margin-top: 14px; }
+.page-list .op-tagline { font-size: clamp(20px, 1rem + 0.8vw, 26px); font-weight: 600; max-width: 34ch; line-height: 1.25; }
+.page-list .op-logline { color: var(--on-2); max-width: 56ch; }
+
+/* The verdict: points, ballots and the spread, cut from paper. */
+.page-list .verdict {
+  display: grid; gap: 28px; margin-top: 22px; align-items: end;
+}
+.page-list .verdict-points { font-size: 22px; font-weight: 700; line-height: 1; }
+.page-list .verdict-points strong { display: block; font-size: clamp(76px, 3rem + 4vw, 128px); line-height: 0.8; margin-bottom: 6px; }
+.page-list .verdict-ballots { margin-top: 10px; color: var(--on-2); font-weight: 500; max-width: 30ch; }
+
+.page-list .spread {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px;
+  max-width: 420px; padding-bottom: 0;
+}
+.page-list .spread-col { display: grid; gap: 8px; }
+.page-list .spread-bar {
+  position: relative; display: block; height: 128px;
+  border-bottom: 10px solid var(--shape);
+}
+.page-list .spread-bar > span {
+  position: absolute; left: 0; right: 0; bottom: 0; background: var(--on);
+  clip-path: var(--cut-b); transform-origin: bottom;
+  transition: transform 200ms var(--ease-out);
+}
+.page-list .spread-col:nth-child(2n) .spread-bar > span { clip-path: var(--cut-c); }
+.page-list .spread-col:nth-child(3) .spread-bar > span { clip-path: var(--cut-a); }
+.page-list .spread:hover .spread-bar > span { transform: scaleY(1.04); }
+.page-list .spread-label { display: grid; justify-items: center; gap: 2px; font-size: 16px; line-height: 1.1; }
+.page-list .spread-pos { color: var(--on-2); font-weight: 600; }
+.page-list .spread-label b { font-size: 20px; }
+.page-list .verdict-actions .btn { min-height: 58px; padding-inline: 30px; font-size: 19px; }
+
+@media (min-width: 900px) {
+  .page-list .op-inner { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; row-gap: 0; }
+  .page-list .op-kicker { grid-column: 1 / 5; grid-row: 1; align-self: start; flex-direction: column; align-items: flex-start; gap: 18px; padding-top: 8px; max-width: 17em; font-size: 20px; }
+  .page-list .op-still { grid-column: 5 / 13; grid-row: 1; }
+  .page-list .op-still .printed { aspect-ratio: 16 / 8.6; }
+  .page-list .op-title { grid-column: 1 / 13; grid-row: 2; }
+  .page-list .op-credit { grid-column: 1 / 8; grid-row: 3; margin-top: 22px; }
+  .page-list .op-tagline, .page-list .op-logline { grid-column: 1 / 8; grid-row: 4; margin-top: 8px; }
+  .page-list .verdict { grid-column: 1 / 13; grid-row: 5; grid-template-columns: auto minmax(0, 420px) 1fr; gap: 56px; margin-top: 40px; }
+  .page-list .verdict-actions { justify-self: end; }
+  .page-list .op-still::before { right: auto; left: -14%; top: -5%; width: 50%; }
+  .page-list .op-bars { top: auto; bottom: 30%; width: 30%; }
+}
+@media (max-width: 899px) {
+  .page-list .opening { min-height: 0; }
+  .page-list .op-kicker { order: 1; }
+  .page-list .op-still { order: 2; margin-inline: calc(var(--pad) * -0.5); }
+  .page-list .op-title { order: 3; }
+  .page-list .op-credit { order: 4; }
+  .page-list .op-tagline, .page-list .op-logline { order: 5; }
+  .page-list .verdict { order: 6; }
+  .page-list .op-bars { top: auto; bottom: 0; width: 46%; }
+  .page-list .op-bars .bar:nth-child(2) { height: 22px; }
+  .page-list .verdict-actions .btn { width: 100%; }
+  .page-list .spread { max-width: none; }
+}
+
+/* ================= Two to five: four posters, each in its own field ====== */
+.page-list .scenes { margin-top: 96px; }
+.page-list .section-head { display: grid; gap: 10px; margin-bottom: 36px; }
+.page-list .section-head .muted { font-size: 17px; }
+.page-list .scene-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) { .page-list .scene-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .page-list .scene-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.page-list .scene {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 26px 24px 34px; overflow: hidden; isolation: isolate;
+}
+.page-list .scene-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.page-list .scene-num {
+  font-size: clamp(130px, 6rem + 6vw, 210px); line-height: 0.74; color: var(--on);
+  margin: 0 0 10px -0.04em; transition: transform 200ms var(--ease-out);
+}
+.page-list .scene-disc { width: clamp(56px, 22%, 84px); margin: 4px -6px 0 0; transition: transform 200ms var(--ease-out); }
+.page-list .scene-still { display: block; aspect-ratio: 4 / 3; margin-inline: -6px; transition: transform 200ms var(--ease-out); }
+.page-list .scene-bar { width: 44%; height: 14px; margin: 6px 0 4px; transition: transform 200ms var(--ease-out); }
+.page-list .scene-title { font-size: clamp(32px, 1.2rem + 1.4vw, 42px); margin-top: 4px; }
+.page-list .scene .credit { color: var(--on-2); }
+.page-list .scene-points { margin-top: auto; padding-top: 10px; font-size: 17px; color: var(--on-2); font-weight: 500; }
+.page-list .scene-points strong { color: var(--on); font-size: 30px; margin-right: 2px; }
+.page-list .scene:hover .scene-num { transform: translateX(6px); }
+.page-list .scene:hover .scene-disc { transform: translate(-7px, 5px); }
+.page-list .scene:hover .scene-still { transform: translate(3px, -4px); }
+.page-list .scene:hover .scene-bar { transform: translateX(14px); }
+.page-list .scene:hover .scene-title a { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.1em; text-decoration-color: var(--shape); }
+.page-list .scene:active .scene-still { transform: translate(0, 1px); }
+@media (max-width: 599px) {
+  .page-list .scene-still { aspect-ratio: 16 / 10; }
+}
+
+/* ================= Programme notes, printed on the black page ============ */
+.page-list .pn { margin-top: 120px; }
+.page-list .pn-body { display: grid; gap: 64px; }
+@media (min-width: 1000px) {
+  .page-list .pn-body { grid-template-columns: minmax(0, 1fr) 360px; column-gap: 80px; align-items: start; }
+  .page-list .pn-only-latest { grid-template-columns: minmax(0, 720px); }
+}
+.page-list .pn-notes { display: grid; gap: 44px 56px; counter-reset: note; }
+@media (min-width: 700px) { .page-list .pn-notes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.page-list .pn-note { display: grid; gap: 12px; align-content: start; counter-increment: note; }
+.page-list .pn-note::before {
+  content: ""; display: block; width: 56px; height: 12px; background: var(--cut);
+  clip-path: var(--cut-c); margin-bottom: 6px;
+}
+.page-list .pn-note:nth-child(3n+2)::before { width: 92px; }
+.page-list .pn-note:nth-child(3n)::before { width: 34px; }
+.page-list .pn-head {
+  font-weight: 800; font-stretch: 78%; font-size: clamp(28px, 1.1rem + 1vw, 36px);
+  line-height: 0.95; letter-spacing: -0.015em; color: var(--paper); text-wrap: balance;
+}
+.page-list .pn-text { font-size: 18px; line-height: 1.6; color: var(--paper-2); max-width: 52ch; text-wrap: pretty; }
+
+/* A film named in a sentence is set as a title and links to its page. */
+.page-list .pn-film {
+  color: var(--paper); font-weight: 750; font-stretch: 85%; text-decoration: underline;
+  text-decoration-color: var(--cut); text-decoration-thickness: 3px; text-underline-offset: 0.2em;
+  transition: color 150ms;
+}
+.page-list .pn-film:hover { text-decoration-thickness: 5px; }
+
+.page-list .pn-latest-head {
+  font-weight: 800; font-stretch: 78%; font-size: 36px; line-height: 0.95; letter-spacing: -0.015em; margin-bottom: 18px;
+}
+.page-list .pn-arrivals { display: grid; gap: 20px; }
+.page-list .pn-arrivals li { display: grid; grid-template-columns: 14px minmax(0, 1fr); column-gap: 14px; }
+.page-list .pn-arrivals li::before { content: ""; grid-row: 1 / 3; width: 14px; height: 14px; margin-top: 6px; border-radius: 50%; background: var(--cut); }
+.page-list .pn-arrivals p:first-child { font-size: 17px; line-height: 1.45; color: var(--paper-2); }
+.page-list .pn-when { margin-top: 2px; font-size: 15px; font-weight: 650; color: var(--paper); font-variant-numeric: tabular-nums; }
+.page-list .pn-invite { margin-top: 30px; font-size: 18px; color: var(--paper-2); }
+.page-list .pn-invite a { color: var(--paper); font-weight: 750; text-decoration-color: var(--cut); text-decoration-thickness: 3px; }
+@media (min-width: 1000px) { .page-list .pn-latest { position: sticky; top: 24px; } }
+
+/* ================= Also starring: end credits on black =================== */
+.page-list .credits { margin-top: 140px; padding-inline: var(--pad); text-align: center; }
+.page-list .credits-bar { display: block; width: 120px; height: 16px; margin: 0 auto 30px; background: var(--cut); clip-path: var(--cut-b); }
+.page-list .credits .section-title { font-size: clamp(56px, 2rem + 6vw, 120px); }
+.page-list .credits-sub { margin-top: 14px; font-size: 17px; }
+.page-list .roll { max-width: 980px; margin: 64px auto 0; display: grid; gap: 26px; }
+.page-list .roll li { display: grid; gap: 4px; justify-items: center; }
+.page-list .roll-left { display: flex; gap: 10px; font-size: 16px; color: var(--paper-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.page-list .roll-place { color: var(--paper); font-weight: 800; font-stretch: 80%; }
+.page-list .roll-right { display: grid; gap: 4px; }
+.page-list .roll-title {
+  font-weight: 800; font-stretch: 75%; font-size: clamp(28px, 1.2rem + 1vw, 36px); line-height: 0.95;
+  letter-spacing: -0.015em; color: var(--paper); text-wrap: balance;
+}
+.page-list .roll-credit { font-size: 15px; color: var(--paper-2); }
+.page-list .roll li:hover .roll-title { text-decoration: underline; text-decoration-color: var(--cut); text-decoration-thickness: 3px; text-underline-offset: 0.12em; }
 @media (min-width: 700px) {
-  .pn-note { grid-template-columns: 210px minmax(0, 1fr); column-gap: 32px; align-items: baseline; }
+  .page-list .roll { gap: 22px; }
+  .page-list .roll li { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 36px; justify-items: stretch; align-items: baseline; }
+  .page-list .roll-left { justify-content: flex-end; text-align: right; }
+  .page-list .roll-right { text-align: left; }
 }
-.pn-head {
-  font-family: var(--serif); font-variation-settings: var(--serif-cut);
-  font-size: 22px; font-weight: 500; line-height: 1.25; letter-spacing: -0.005em;
-}
-.pn-text { font-size: 18px; line-height: 1.6; max-width: 62ch; color: var(--text-2); text-wrap: pretty; }
 
-/* A film named in a sentence is set as a title, and links to its page. */
-.pn-film {
-  font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 600;
-  font-size: 1.06em; color: var(--text); text-decoration: underline;
-  text-decoration-color: var(--line-strong); text-decoration-thickness: 1px; text-underline-offset: 0.2em;
-  transition: text-decoration-color 150ms;
+/* ================= Empty: a title card before the first ballot =========== */
+.page-list .empty {
+  position: relative; overflow: hidden; isolation: isolate;
+  min-height: calc(100svh - 70px); display: grid; align-items: center; padding: 64px 0 80px;
 }
-.pn-film:hover { text-decoration-color: currentColor; }
-
-/* Just counted: a quiet column of the newest ballots. */
-.pn-latest { padding-top: 4px; }
-.pn-latest-head { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
-.pn-arrivals li { padding: 12px 0; border-bottom: 1px solid var(--line); }
-.pn-arrivals li:last-child { border-bottom: 0; }
-.pn-arrivals p:first-child { font-size: 17px; line-height: 1.45; color: var(--text-2); }
-.pn-when { margin-top: 2px; font-size: 14px; color: var(--text-2); font-variant-numeric: tabular-nums; }
-.pn-invite { margin-top: 14px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 16px; color: var(--text-2); }
-.pn-invite a { color: var(--text); font-weight: 600; text-decoration: underline; text-decoration-color: var(--line-strong); }
-.pn-invite a:hover { text-decoration-color: currentColor; }
-@media (min-width: 980px) {
-  .pn-latest { position: sticky; top: 24px; }
+.page-list .empty-disc { position: absolute; z-index: 0; width: clamp(260px, 52vw, 720px); right: -14%; top: 50%; translate: 0 -50%; }
+.page-list .empty-bars { top: auto; bottom: 6%; left: 0; right: auto; justify-items: start; width: 36%; }
+.page-list .empty-card { position: relative; z-index: 2; display: grid; gap: 22px; justify-items: start; }
+.page-list .empty .kicker { font-size: 20px; }
+.page-list .empty-title { font-size: clamp(64px, 2rem + 10vw, 200px); }
+.page-list .empty-title .pasted { animation: drop-in 560ms var(--ease-back) 640ms both; }
+.page-list .empty .logline { color: var(--paper-2); font-size: 19px; max-width: 46ch; margin-top: 16px; }
+.page-list .empty .btn { margin-bottom: 72px; }
+.page-list .empty .logline, .page-list .empty .kicker { position: relative; }
+@media (max-width: 699px) {
+  .page-list .empty-disc { top: 6%; translate: none; right: -30%; }
+  .page-list .empty-bars { bottom: 6%; width: 60%; }
 }

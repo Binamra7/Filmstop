@@ -138,7 +138,7 @@ func (s *Server) fiveDetails(ms []store.Movie) {
 		return
 	}
 	for _, m := range ms {
-		if m.Detailed {
+		if m.Complete() {
 			continue
 		}
 		if _, busy := fiveDetailing.LoadOrStore(m.ID, true); busy {

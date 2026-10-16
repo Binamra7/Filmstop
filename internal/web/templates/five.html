@@ -4,17 +4,39 @@
 
 {{define "content"}}
 {{$one := .One}}
-<section class="opening f5-opening" aria-labelledby="f5-title">
-  <div class="opening-still">
-    {{with $one.BackdropPath}}
-    <img src="{{poster . "w1280"}}" srcset="{{poster . "w780"}} 780w, {{poster . "w1280"}} 1280w, {{poster . "original"}} 1920w" sizes="100vw" width="1280" height="720" alt="" fetchpriority="high" decoding="async">
-    {{else}}{{with $one.PosterPath}}<img class="from-poster" src="{{poster . "w780"}}" width="780" height="1170" alt="" fetchpriority="high" decoding="async">{{end}}{{end}}
+<div class="five-page">
+<section class="f5-hero field-{{field $one.Swatch $one.ID}}" aria-labelledby="f5-title">
+  <div class="sweep" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="wrap f5-hero-grid">
+    <p class="kicker f5-kicker">Number one in {{if .Owner}}your five{{else}}someone’s five{{end}}</p>
+    <span class="f5-big num" aria-hidden="true">1</span>
+    <div class="f5-one-still reveal">
+      <div class="printed cut-a">
+        {{with $one.BackdropPath}}
+        <img src="{{poster . "w1280"}}" srcset="{{poster . "w780"}} 780w, {{poster . "w1280"}} 1280w, {{poster . "original"}} 1920w" sizes="(min-width: 900px) 70vw, 100vw" width="1280" height="720" alt="" fetchpriority="high" decoding="async">
+        {{else}}{{with $one.PosterPath}}<img class="from-poster" src="{{poster . "w780"}}" width="780" height="1170" alt="" fetchpriority="high" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}
+      </div>
+    </div>
+    <h1 id="f5-title" class="film-title f5-title{{if gt (len $one.Title) 28}} is-long{{else if gt (len $one.Title) 13}} is-mid{{end}}"><span class="pasted"><span class="strip">{{$one.Title}}</span></span></h1>
+    <p class="credit f5-credit">{{template "credit" $one.Movie}}{{if $one.Place}} · {{template "f5-place" $one}}{{end}}</p>
   </div>
-  <div class="title-card">
-    <p class="kicker">Number one in {{if .Owner}}your five{{else}}someone’s five{{end}}</p>
-    <h1 id="f5-title" class="film-title">{{$one.Title}}</h1>
-    <p class="credit">{{template "credit" $one.Movie}}</p>
-  </div>
+</section>
+
+<section class="wrap f5-strip-wrap" aria-labelledby="f5-rest">
+  <h2 id="f5-rest" class="visually-hidden">Two to five</h2>
+  <ol class="f5-strip" start="2">
+    {{range .Rest}}
+    <li class="f5-scene field-{{field .Swatch .ID}} reveal">
+      <span class="f5-num num" aria-hidden="true">{{.Pos}}</span>
+      <div class="printed cut-b f5-still">{{template "f5-still" .}}</div>
+      <div class="f5-text">
+        <h3 class="film-title"><span class="visually-hidden">Number {{.Pos}}: </span>{{.Title}}</h3>
+        <p class="credit">{{if .Director}}{{.Director}} · {{end}}{{.Year}}</p>
+        {{if .Place}}<p class="f5-place">{{template "f5-place" .}}</p>{{end}}
+      </div>
+    </li>
+    {{end}}
+  </ol>
 </section>
 
 <section class="wrap f5-bill" aria-label="The programme">
@@ -31,38 +53,23 @@
   </div>
 </section>
 
-<section class="wrap f5-strip-wrap" aria-labelledby="f5-rest">
-  <h2 id="f5-rest" class="visually-hidden">Two to five</h2>
-  <ol class="f5-strip" start="2">
-    {{range .Rest}}
-    <li class="f5-scene">
-      <div class="scene-still f5-still">
-        {{template "f5-still" .}}
-        <span class="f5-num" aria-hidden="true">{{.Pos}}</span>
-      </div>
-      <div class="f5-text">
-        <h3 class="film-title"><span class="visually-hidden">Number {{.Pos}}: </span>{{.Title}}</h3>
-        <p class="credit">{{if .Director}}{{.Director}} · {{end}}{{.Year}}</p>
-        {{if .Place}}<p class="f5-place">{{template "f5-place" .}}</p>{{end}}
-      </div>
-    </li>
-    {{end}}
-  </ol>
-</section>
-
-<section class="wrap f5-reading" aria-labelledby="f5-reading-head">
-  <div class="f5-reading-head">
-    <h2 id="f5-reading-head" class="section-title">{{if .Owner}}What your five says{{else}}What this five says{{end}}</h2>
-    <p class="f5-headline film-title">{{.Taste.Headline}}</p>
-  </div>
-  <div class="f5-prose">
-    {{range .Taste.Paras}}<p>{{range .}}{{if .Film}}<span class="f5-name">{{.Text}}</span>{{else}}{{.Text}}{{end}}{{end}}</p>
-    {{end}}
-    {{if not .Owner}}
-    <p class="f5-cta"><a class="btn btn-primary" href="/ballot">Pick your own five</a> <a class="f5-link" href="/">See the whole list</a></p>
-    {{end}}
+<section class="f5-reading" aria-labelledby="f5-reading-head">
+  <div class="wrap f5-reading-grid">
+    <div class="f5-reading-head">
+      <h2 id="f5-reading-head" class="f5-reading-title">{{if .Owner}}What your five says{{else}}What this five says{{end}}</h2>
+      <p class="f5-headline film-title">{{.Taste.Headline}}</p>
+      <span class="f5-reading-bar bar" aria-hidden="true"></span>
+    </div>
+    <div class="f5-prose">
+      {{range .Taste.Paras}}<p>{{range .}}{{if .Film}}<span class="f5-name">{{.Text}}</span>{{else}}{{.Text}}{{end}}{{end}}</p>
+      {{end}}
+      {{if not .Owner}}
+      <p class="f5-cta"><a class="btn btn-primary" href="/ballot">Pick your own five</a> <a class="f5-link" href="/">See the whole list</a></p>
+      {{end}}
+    </div>
   </div>
 </section>
+</div>
 
 {{if .Owner}}
 <script>

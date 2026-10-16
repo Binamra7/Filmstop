@@ -117,7 +117,7 @@ func (k *boardKeeper) enrich(ctx context.Context) int {
 		k.mu.Lock()
 		at, failed := k.failed[e.MovieID]
 		k.mu.Unlock()
-		if e.Detailed || failed && time.Since(at) < detailsRetry {
+		if e.Complete() || failed && time.Since(at) < detailsRetry {
 			continue
 		}
 		wg.Add(1)
