@@ -55,6 +55,25 @@ docker compose run --rm seed && docker compose up -d
 
 Without compose: `docker build -t filmstop . && docker run -p 8080:8080 -v filmstop-data:/data -e TMDB_API_KEY filmstop`.
 
+## Deploy (Render + Turso, both free)
+
+Render's free web service wipes its disk on restart, so in production the
+database is [Turso](https://turso.tech) (hosted SQLite). Without
+`TURSO_DATABASE_URL` the app uses the local SQLite file as before.
+
+1. In Turso, create a database and an auth token. Note the `libsql://...` URL.
+2. In Render, choose **New > Blueprint**, pick this repo, and fill in
+   `TMDB_API_KEY`, `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`. `render.yaml`
+   does the rest.
+
+The free service sleeps after 15 idle minutes, and the next visit takes about a
+minute to wake it. For demo data, seed Turso from your machine, then restart the
+service in Render:
+
+```sh
+TURSO_DATABASE_URL=libsql://... TURSO_AUTH_TOKEN=... TMDB_API_KEY=... go run ./cmd/seed -voters 400
+```
+
 ## How the list is counted
 
 Each ballot gives 5 points to its #1 down to 1 point to its #5. Points are summed,
