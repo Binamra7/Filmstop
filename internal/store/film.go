@@ -25,6 +25,7 @@ func (s *Store) FilmTally(ctx context.Context, id int64) (rank.Tally, error) {
 // Companions returns the films most often cast on the same ballots as id. Ties
 // go to the film its voters ranked higher, then the lower id.
 func (s *Store) Companions(ctx context.Context, id int64, limit int) ([]Companion, error) {
+	// 6 - position is rank.Points for that position.
 	rows, err := s.db.QueryContext(ctx, `SELECT m.id, m.title, m.year, m.poster_path, m.backdrop_path, m.overview,
 		m.tagline, m.director, m.runtime, m.genres, m.detailed, count(*) AS shared
 		FROM ballots a

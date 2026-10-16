@@ -28,7 +28,8 @@ type Arrival struct {
 	At   time.Time
 }
 
-// Thresholds below which a note would be noise rather than news.
+// Limits for the programme notes. Below these a note would be noise rather
+// than news; maxNotes caps how many the home page shows.
 const (
 	notesMinVoters     = 5
 	maxNotes           = 5
@@ -323,7 +324,8 @@ func arrivals(os []store.Opener) []Arrival {
 
 var smallNumbers = []string{"no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"}
 
-// count spells small numbers out, as a sentence would.
+// spell writes 0 to 12 as words, as a sentence would, and larger numbers with
+// thousands separators.
 func spell(n int) string {
 	if n >= 0 && n < len(smallNumbers) {
 		return smallNumbers[n]

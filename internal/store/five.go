@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS share_codes (
 // CodeLen is the length of a share code.
 const CodeLen = 10
 
-// codeAlphabet is base32 without the letters and digits people misread.
+// codeAlphabet is a-z and 2-9 without i, l and o, which people misread.
 const codeAlphabet = "abcdefghjkmnpqrstuvwxyz23456789"
 
 // ValidCode reports whether code could be a share code, so junk never reaches
@@ -42,7 +42,7 @@ func newCode() string {
 	buf := make([]byte, CodeLen)
 	rand.Read(buf)
 	for i, b := range buf {
-		// 31 letters, so a tiny modulo bias; irrelevant for an unguessable link.
+		// 31 symbols, so a tiny modulo bias; irrelevant for an unguessable link.
 		buf[i] = codeAlphabet[int(b)%len(codeAlphabet)]
 	}
 	return string(buf)

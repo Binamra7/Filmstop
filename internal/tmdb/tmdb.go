@@ -1,5 +1,6 @@
-// Package tmdb searches The Movie Database, with an in-memory cache so repeat
-// queries (and every keystroke that lands on the same prefix) never leave the box.
+// Package tmdb is a client for The Movie Database: film search and per-film
+// details. Search keeps an in-memory cache so repeat queries (and every
+// keystroke that lands on the same prefix) never leave the box.
 package tmdb
 
 import (
@@ -16,8 +17,10 @@ import (
 	"github.com/Binamra7/filmstop/internal/store"
 )
 
+// ErrNoKey is returned by Search and Details on a client made without a key.
 var ErrNoKey = errors.New("TMDB_API_KEY is not set")
 
+// Client talks to TMDB's v3 API. It is safe for concurrent use.
 type Client struct {
 	key  string
 	http *http.Client
@@ -37,7 +40,9 @@ const (
 	maxHits   = 8
 )
 
-// New accepts either a v3 API key or a v4 read access token.
+// New returns a client for key, which may be a v3 API key or a v4 read access
+// token. With an empty key, Enabled reports false and every call fails with
+// ErrNoKey.
 func New(key string) *Client {
 	return &Client{
 		key:   strings.TrimSpace(key),
@@ -46,9 +51,11 @@ func New(key string) *Client {
 	}
 }
 
+// Enabled reports whether the client has a key.
 func (c *Client) Enabled() bool { return c.key != "" }
 
-// Search finds films by title. fresh reports that the results came from TMDB
+// Search finds films by title and returns at most eight. Case and extra
+// spaces in query don't matter. fresh reports that the results came from TMDB
 // rather than the cache, so the caller knows they haven't been stored yet.
 func (c *Client) Search(ctx context.Context, query string) (movies []store.Movie, fresh bool, err error) {
 	if c.key == "" {
@@ -139,6 +146,7 @@ func (c *Client) get(ctx context.Context, path string, v url.Values, out any) er
 
 // Details fetches the tagline, director, runtime and genres for one film, plus
 // its backdrop and poster (search results sometimes lack ones the film page has).
+// It keeps the first two directors and genres, and sets d.Detailed.
 func (c *Client) Details(ctx context.Context, id int64) (backdrop, poster string, d store.Details, err error) {
 	if c.key == "" {
 		return "", "", d, ErrNoKey

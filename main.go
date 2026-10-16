@@ -1,8 +1,13 @@
-// Command filmstop serves the Filmstop site.
+// Command filmstop serves the Filmstop site. It is configured through the
+// environment:
 //
-//	PORT            listen port (default 8080)
-//	DATABASE_PATH   SQLite file (default filmstop.db)
-//	TMDB_API_KEY    TMDB v3 key or v4 read token; search is off without it
+//	PORT                listen port (default 8080)
+//	DATABASE_PATH       SQLite file (default filmstop.db)
+//	TURSO_DATABASE_URL  Turso database to use instead of DATABASE_PATH
+//	TURSO_AUTH_TOKEN    auth token for TURSO_DATABASE_URL
+//	TMDB_API_KEY        TMDB v3 key or v4 read token; search is off without it
+//
+// It stops on SIGINT or SIGTERM, giving open requests 5 seconds to finish.
 //
 // "filmstop -healthcheck" exits 0 if the server on PORT answers /healthz. The
 // container image has no shell or curl, so Docker's HEALTHCHECK uses this.

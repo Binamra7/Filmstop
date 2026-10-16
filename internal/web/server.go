@@ -28,6 +28,8 @@ import (
 //go:embed templates static
 var assets embed.FS
 
+// Server holds what the handlers share: the store, the TMDB client, the
+// current board and the parsed templates and static files.
 type Server struct {
 	st       *store.Store
 	tmdb     *tmdb.Client
@@ -40,6 +42,9 @@ type Server struct {
 	ctx context.Context
 }
 
+// New builds the first board and loads the embedded templates and static
+// files. Cancelling ctx stops the board's background rebuilds and any detail
+// fetches a request started.
 func New(ctx context.Context, st *store.Store, tm *tmdb.Client) (*Server, error) {
 	secret, err := st.Secret(ctx)
 	if err != nil {
@@ -59,6 +64,7 @@ func New(ctx context.Context, st *store.Store, tm *tmdb.Client) (*Server, error)
 	return s, nil
 }
 
+// Handler returns the site's routes, /healthz included.
 func (s *Server) Handler() http.Handler {
 	r := gin.New()
 	r.Use(gin.Recovery(), sameOrigin)
@@ -219,6 +225,7 @@ func (s *Server) execute(page, block string, data any) (*rendered, error) {
 		return nil, fmt.Errorf("render %s/%s: %w", page, block, err)
 	}
 	r := &rendered{raw: buf.Bytes()}
+	// Below 1 KB gzip saves too little to be worth the CPU.
 	if len(r.raw) >= 1024 {
 		var zb bytes.Buffer
 		gz := gzPool.Get().(*gzip.Writer)

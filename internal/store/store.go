@@ -1,4 +1,5 @@
-// Package store keeps films, ballots and drafts in SQLite.
+// Package store keeps films, ballots, drafts and share codes in SQLite: a local
+// file, or a Turso (libSQL) database when TURSO_DATABASE_URL is set.
 package store
 
 import (
@@ -18,6 +19,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// Movie is a film as stored from TMDB. ID is TMDB's own id.
 type Movie struct {
 	ID           int64
 	Title        string
@@ -28,18 +30,20 @@ type Movie struct {
 	Details
 }
 
-// Details come from a second TMDB call, fetched once per film that reaches the list.
+// Details come from a second TMDB call per film, made when the film reaches the
+// board, its page is opened or it is on a shared card.
 type Details struct {
 	Tagline  string
-	Director string
-	Runtime  int // minutes
-	Genres   string
-	Detailed bool
+	Director string // up to two names, joined by " & "
+	Runtime  int    // minutes
+	Genres   string // up to two, comma-separated
+	Detailed bool   // fetched from TMDB; false means fetch again
 }
 
 // Ballot is five movie ids in rank order; 0 marks an empty slot.
 type Ballot [rank.Slots]int64
 
+// Full reports whether every slot holds a film.
 func (b Ballot) Full() bool {
 	for _, id := range b {
 		if id == 0 {
@@ -49,6 +53,7 @@ func (b Ballot) Full() bool {
 	return true
 }
 
+// Store is the database. It is safe for concurrent use.
 type Store struct{ db *sql.DB }
 
 const schema = `
@@ -137,7 +142,8 @@ func remote(src string) bool {
 	return false
 }
 
-// Open takes a SQLite file path or a Turso URL from Source.
+// Open connects to src, a SQLite file path or a Turso URL from Source, and
+// creates or updates the schema.
 func Open(src string) (*Store, error) {
 	driver, dsn := "libsql", src
 	if !remote(src) {
@@ -164,6 +170,7 @@ func Open(src string) (*Store, error) {
 	return &Store{db: db}, nil
 }
 
+// Close closes the database.
 func (s *Store) Close() error { return s.db.Close() }
 
 // Secret returns the cookie-signing key, creating it on first run so voters keep
@@ -183,6 +190,8 @@ func (s *Store) Secret(ctx context.Context) ([]byte, error) {
 	return hex.DecodeString(v)
 }
 
+// UpsertMovies adds films or updates their title, year and overview. An empty
+// poster or backdrop never replaces a stored one, and details are left alone.
 func (s *Store) UpsertMovies(ctx context.Context, ms []Movie) error {
 	if len(ms) == 0 {
 		return nil
@@ -318,6 +327,8 @@ func saveDraft(ctx context.Context, tx *sql.Tx, voter string, b Ballot) error {
 	return err
 }
 
+// SaveDraft replaces the voter's draft with b. The draft stays open even when b
+// is empty, so Draft won't fall back to the cast ballot.
 func (s *Store) SaveDraft(ctx context.Context, voter string, b Ballot) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -398,8 +409,8 @@ func (s *Store) CastAt(ctx context.Context, voter string, b Ballot, at time.Time
 		return err
 	}
 	for _, q := range []string{`DELETE FROM drafts WHERE voter = ?`, `DELETE FROM draft_open WHERE voter = ?`,
-		// Delete and insert rather than upsert, so a recast gets a new rowid and
-		// sorts as the newest ballot in LatestOpeners.
+		// Delete and insert rather than upsert, so a recast gets a new rowid:
+		// LatestOpeners breaks same-second ties on it.
 		`DELETE FROM ballot_times WHERE voter = ?`} {
 		if _, err := tx.ExecContext(ctx, q, voter); err != nil {
 			return err
@@ -411,6 +422,7 @@ func (s *Store) CastAt(ctx context.Context, voter string, b Ballot, at time.Time
 	return tx.Commit()
 }
 
+// HasCast reports whether the voter has a counted ballot.
 func (s *Store) HasCast(ctx context.Context, voter string) (bool, error) {
 	var one int
 	err := s.db.QueryRowContext(ctx, `SELECT 1 FROM ballot_times WHERE voter = ?`, voter).Scan(&one)
@@ -426,7 +438,8 @@ func (s *Store) Voters(ctx context.Context) (n int, err error) {
 	return n, err
 }
 
-// Tallies counts, per film, how many ballots placed it at each position.
+// Tallies counts, per film, how many ballots placed it at each position, and
+// returns the number of ballots cast.
 func (s *Store) Tallies(ctx context.Context) (ts []rank.Tally, voters int, err error) {
 	if voters, err = s.Voters(ctx); err != nil {
 		return nil, 0, err

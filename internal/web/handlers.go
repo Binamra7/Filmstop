@@ -208,6 +208,8 @@ type hitList struct {
 	Picked map[int64]int
 }
 
+// Hits pairs ms with the voter's picks for the "hits" template, since a
+// template can't build a struct itself.
 func (v resultsView) Hits(ms []store.Movie) hitList { return hitList{ms, v.Picked} }
 
 func (s *Server) results(c *gin.Context, q string, b store.Ballot) resultsView {
@@ -276,7 +278,7 @@ func (s *Server) edit(c *gin.Context, fn func(b *store.Ballot) string) {
 
 // respondBallot answers an htmx ballot action with the new panel, plus the
 // search results (or, with an empty search, the quick adds) out of band so
-// their "Scene N" marks stay true.
+// their "Scene N" marks stay true. A plain form post is redirected to /ballot.
 func (s *Server) respondBallot(c *gin.Context, b store.Ballot, flash string, done bool) {
 	if c.GetHeader("HX-Request") == "" {
 		to := "/ballot"

@@ -20,6 +20,7 @@ const (
 	detailsRetry = time.Hour
 )
 
+// Entry is one film on the board: its standing and its stored details.
 type Entry struct {
 	rank.Standing
 	store.Movie
@@ -37,10 +38,12 @@ type Board struct {
 	Latest []Arrival
 }
 
+// Top returns the first five entries, or all of them on a shorter board.
 func (b *Board) Top() []Entry {
 	return b.Entries[:min(rank.Slots, len(b.Entries))]
 }
 
+// Rest returns the entries after the top five.
 func (b *Board) Rest() []Entry {
 	if len(b.Entries) <= rank.Slots {
 		return nil
@@ -68,6 +71,8 @@ func newBoardKeeper(ctx context.Context, st *store.Store, tm *tmdb.Client) (*boa
 	return k, nil
 }
 
+// Load returns the current board. It is never nil: newBoardKeeper builds the
+// first one before returning.
 func (k *boardKeeper) Load() *Board { return k.cur.Load() }
 
 // Touch asks for a rebuild. A burst of casts collapses into one rebuild.
