@@ -148,9 +148,9 @@ func (s *Server) fiveDetails(ms []store.Movie) {
 			defer fiveDetailing.Delete(id)
 			ctx, cancel := context.WithTimeout(s.ctx, 15*time.Second)
 			defer cancel()
-			backdrop, d, err := s.tmdb.Details(ctx, id)
+			backdrop, poster, d, err := s.tmdb.Details(ctx, id)
 			if err == nil {
-				err = s.st.SetDetails(ctx, id, backdrop, d)
+				err = s.st.SetDetails(ctx, id, backdrop, poster, d)
 			}
 			if err != nil {
 				slog.Warn("film details", "id", id, "err", err)

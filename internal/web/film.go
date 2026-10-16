@@ -106,9 +106,9 @@ func (s *Server) filmNotFound(c *gin.Context) {
 func (s *Server) fillDetails(c *gin.Context, m *store.Movie) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 2500*time.Millisecond)
 	defer cancel()
-	backdrop, d, err := s.tmdb.Details(ctx, m.ID)
+	backdrop, poster, d, err := s.tmdb.Details(ctx, m.ID)
 	if err == nil {
-		err = s.st.SetDetails(ctx, m.ID, backdrop, d)
+		err = s.st.SetDetails(ctx, m.ID, backdrop, poster, d)
 	}
 	if err != nil {
 		slog.Warn("film details", "id", m.ID, "err", err)
@@ -117,6 +117,9 @@ func (s *Server) fillDetails(c *gin.Context, m *store.Movie) {
 	m.Details = d
 	if backdrop != "" {
 		m.BackdropPath = backdrop
+	}
+	if poster != "" {
+		m.PosterPath = poster
 	}
 }
 

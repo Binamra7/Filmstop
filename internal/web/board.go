@@ -119,9 +119,9 @@ func (k *boardKeeper) enrich(ctx context.Context) int {
 		sem <- struct{}{}
 		go func(id int64) {
 			defer func() { <-sem; wg.Done() }()
-			backdrop, d, err := k.tmdb.Details(ctx, id)
+			backdrop, poster, d, err := k.tmdb.Details(ctx, id)
 			if err == nil {
-				err = k.st.SetDetails(ctx, id, backdrop, d)
+				err = k.st.SetDetails(ctx, id, backdrop, poster, d)
 			}
 			k.mu.Lock()
 			defer k.mu.Unlock()

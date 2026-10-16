@@ -23,6 +23,10 @@ func (v voters) sign(id string) string {
 	return hex.EncodeToString(m.Sum(nil)[:16])
 }
 
+// VoterCookie is the fs_voter cookie value for voter id under secret, for tools
+// (the seed) that hand out cookies for known voters.
+func VoterCookie(secret []byte, id string) string { return id + "." + voters{secret}.sign(id) }
+
 func (v voters) verify(cookie string) (string, bool) {
 	id, sig, ok := strings.Cut(cookie, ".")
 	if !ok || len(id) != 32 {
@@ -45,7 +49,7 @@ func (v voters) middleware(c *gin.Context) {
 	id := hex.EncodeToString(buf)
 	secure := c.Request.TLS != nil || c.GetHeader("X-Forwarded-Proto") == "https"
 	http.SetCookie(c.Writer, &http.Cookie{
-		Name: voterCookie, Value: id + "." + v.sign(id), Path: "/",
+		Name: voterCookie, Value: VoterCookie(v.secret, id), Path: "/",
 		MaxAge: 2 * 365 * 24 * 3600, HttpOnly: true, Secure: secure, SameSite: http.SameSiteLaxMode,
 	})
 	c.Set(voterCookie, id)

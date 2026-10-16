@@ -138,15 +138,16 @@ func (c *Client) get(ctx context.Context, path string, v url.Values, out any) er
 }
 
 // Details fetches the tagline, director, runtime and genres for one film, plus
-// its backdrop (search results sometimes lack one that the film page has).
-func (c *Client) Details(ctx context.Context, id int64) (backdrop string, d store.Details, err error) {
+// its backdrop and poster (search results sometimes lack ones the film page has).
+func (c *Client) Details(ctx context.Context, id int64) (backdrop, poster string, d store.Details, err error) {
 	if c.key == "" {
-		return "", d, ErrNoKey
+		return "", "", d, ErrNoKey
 	}
 	var body struct {
 		Tagline  string `json:"tagline"`
 		Runtime  int    `json:"runtime"`
 		Backdrop string `json:"backdrop_path"`
+		Poster   string `json:"poster_path"`
 		Genres   []struct {
 			Name string `json:"name"`
 		} `json:"genres"`
@@ -159,7 +160,7 @@ func (c *Client) Details(ctx context.Context, id int64) (backdrop string, d stor
 	}
 	v := url.Values{"append_to_response": {"credits"}, "language": {"en-US"}}
 	if err := c.get(ctx, fmt.Sprintf("/movie/%d", id), v, &body); err != nil {
-		return "", d, err
+		return "", "", d, err
 	}
 	d = store.Details{Tagline: body.Tagline, Runtime: body.Runtime, Detailed: true}
 	var directors, genres []string
@@ -175,5 +176,5 @@ func (c *Client) Details(ctx context.Context, id int64) (backdrop string, d stor
 	}
 	d.Director = strings.Join(directors, " & ")
 	d.Genres = strings.Join(genres, ", ")
-	return body.Backdrop, d, nil
+	return body.Backdrop, body.Poster, d, nil
 }
