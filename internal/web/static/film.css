@@ -48,7 +48,7 @@
 
 /* ---------- Where it stands, on a sheet of paper */
 .film-page .fp-paper {
-  --field: var(--paper); --on: var(--ink); --on-2: #4a4038; --shape: var(--cut);
+  --field: var(--paper); --on: var(--ink); --on-2: var(--paper-ink-2); --shape: var(--cut);
   background: var(--field); color: var(--on);
   padding: 64px 0 72px;
 }

@@ -50,7 +50,7 @@
 .booth .bl-scene:not(.bl-empty):nth-child(even) { clip-path: var(--cut-c); }
 .booth .bl-scene:not(.bl-empty):hover { transform: rotate(0deg) translateX(4px); }
 /* An ink film would vanish into the ink page, so it is printed on bare paper. */
-.booth .bl-scene.field-ink { --field: var(--paper); --on: var(--ink); --on-2: #55493f; }
+.booth .bl-scene.field-ink { --field: var(--paper); --on: var(--ink); --on-2: var(--paper-ink-2); }
 .booth .bl-scene.field-ink .printed img { mix-blend-mode: multiply; filter: grayscale(1) contrast(1.25) brightness(1.08); opacity: 1; }
 .booth .bl-scene.field-ink:hover .printed img { filter: none; }
 
@@ -194,7 +194,7 @@
   background: var(--paper); color: var(--ink); clip-path: var(--cut-c);
   font: 650 22px/1 var(--font); font-stretch: 90%; -webkit-appearance: none; appearance: none;
 }
-.booth .bl-search input::placeholder { color: #55493f; opacity: 1; }
+.booth .bl-search input::placeholder { color: var(--paper-ink-2); opacity: 1; }
 .booth .bl-search input:focus-visible { outline: none; }
 .booth .bl-search input:disabled { opacity: 0.5; }
 .booth .bl-search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
@@ -222,7 +222,7 @@
   padding: 8px; border: 0; background: transparent; text-align: left;
   transition: transform 180ms var(--ease-out), background-color 180ms;
 }
-.booth .bl-hit:hover:not(:disabled) { background: #221c17; transform: translateX(4px); }
+.booth .bl-hit:hover:not(:disabled) { background: var(--ink-raised); transform: translateX(4px); }
 .booth .bl-hit:disabled { cursor: default; }
 .booth .bl-thumb { display: block; width: 56px; aspect-ratio: 2 / 3; }
 /* The poster is how people recognise a film in a list, so show it as printed. */

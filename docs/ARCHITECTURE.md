@@ -27,7 +27,7 @@ browser ── HTML / htmx fragments ──▶ Gin (internal/web)
 The ranked list lives in memory, not in the database. `boardKeeper` (`web/board.go`) holds the current `Board` behind an `atomic.Pointer`, so a page read is a pointer load.
 
 - **Rebuild.** Casting a ballot calls `Touch`, which drops a token in a channel with room for one. A background loop takes the token, reads every film's tally from the store, orders them with `internal/rank`, and swaps in a new `Board` with the top 30, the voter count, the programme notes and the latest ballots. A burst of casts collapses into one rebuild.
-- **Details.** After a rebuild, films on the board without TMDB details (director, runtime, genres, tagline, stills) are fetched four at a time and stored. A film whose fetch failed waits an hour before the next try.
+- **Details.** After a rebuild, films on the board whose details aren't `Complete()` are fetched four at a time and stored. Details are the director, runtime, genres, tagline, stills and the poster's colour swatch; `Details.Complete()` (`store/store.go`) is true once the details are fetched (`detailed` = 1) and the swatch is measured. A film whose fetch failed waits an hour before the next try. Film pages and cards fetch details the same way for films that aren't on the board.
 - **Home page cache.** The rendered home page is cached per board and per minute (relative times like "3 min ago" change each minute), in two versions: for visitors who have and haven't voted. Each version is gzipped once.
 - **Startup.** The first board is built before the server starts listening. Because the board is only rebuilt by this process, a change made straight to the database (seeding production, say) shows up only after a restart.
 
@@ -42,7 +42,7 @@ All tables are created on startup with `CREATE TABLE IF NOT EXISTS`, and columns
 | Table | Holds |
 | --- | --- |
 | `meta` | Key–value settings: the cookie-signing secret |
-| `movies` | Films seen in search or ballots: title, year, poster and backdrop paths, overview, and the TMDB details once fetched (`detailed` = 1) |
+| `movies` | Films seen in search or ballots: title, year, poster and backdrop paths, overview, the TMDB details once fetched (`detailed` = 1), and `swatch`, the poster's dominant colour (`#rrggbb`, `none` when there's no readable poster, empty until measured) |
 | `ballots` | Counted ballots: `(voter, position 1–5, movie_id)` |
 | `ballot_times` | When each voter last cast; feeds "latest ballots" |
 | `drafts` | The ballot being edited, same shape as `ballots` |
@@ -62,6 +62,23 @@ Casting copies the draft into `ballots`, clears the draft and stamps `ballot_tim
 
 `internal/tmdb` makes two calls: search (`/search/movie`) and details (`/movie/:id` with credits). Search results are cached in memory for 30 minutes. A v3 key goes in the query string and a v4 token in the `Authorization` header. Errors never include the request URL, because it can carry the key. Without a key, `Enabled` reports false and the site runs with search off.
 
+The details call also measures the poster's colour (`tmdb/swatch.go`). It downloads the poster at TMDB's smallest size (`w92`, 92 px wide) and finds its dominant colour: each pixel votes for one of 36 hue bins with a weight of saturation × value, so a small saturated title beats a large grey sky, and pixels with almost no colour don't vote. The winning bin's weighted average colour is the swatch. A poster with almost no vivid pixels (black and white) gives its plain average colour. When there's no poster or it can't be read, the swatch is `"none"`, so the film isn't measured again on every rebuild.
+
+## Colour fields
+
+Every film is drawn on one of eight colour fields: `orange`, `mustard`, `rose`, `aqua`, `red`, `teal`, `navy` and `ink`. `web.fieldOf` (`web/field.go`, the `field` template function) maps a swatch to a field when the page renders, by hue, with grey and near-black posters going to `ink`. A film not measured yet (empty swatch, `none`, or anything unparseable) gets a field chosen from its id, so it keeps the same colour until it's measured. Templates write the result as a class (`field-orange`); the classes in `static/site.css` set `--field`, `--on`, `--on-2` and `--shape`. [`DESIGN.md`](DESIGN.md) lists the colours and their contrast.
+
 ## Static files
 
-Files in `web/static` are loaded at startup, named by a short SHA-256 of their content, gzipped once and served with `Cache-Control: public, max-age=31536000, immutable`. Changing a file changes its URL, so browsers never see a stale version. CSS for the page being rendered is inlined, and the fonts are preloaded.
+Files in `web/static` are loaded at startup, named by a short SHA-256 of their content, gzipped once and served with `Cache-Control: public, max-age=31536000, immutable`. Changing a file changes its URL, so browsers never see a stale version.
+
+- **CSS:** every `static/*.css` is inlined into every page's `<style>`, `site.css` first and then the rest in name order (`loadCSS` in `web/server.go`). There are no stylesheet requests, but each page file's rules reach every page, so they are scoped under the page's wrapper class (`.page-list` on the list's `<body>`, `.booth`, `.film-page`, `.five-page`, `.method-page`, `.nf-page`) or use class names only that page has (the ballot's `bl-` prefix).
+- **Fonts:** one variable family, Bricolage Grotesque, in two files declared in `templates/layout.html`: `bricolage.woff2` (Latin, preloaded) and `bricolage-ext.woff2` (Latin Extended). Their `unicode-range`s mean the second is downloaded only when a page contains one of its characters, such as a title with an accented letter outside Latin-1.
+
+## Motion
+
+All motion is CSS; the only script involved removes the cast sequence early.
+
+- **View transitions.** `site.css` sets `@view-transition { navigation: auto; }`, so in browsers that support cross-document view transitions (Chromium) moving between pages cross-fades; elsewhere pages load normally. On the ballot, the htmx actions swap with `transition:true` and each strip carries `view-transition-name: film-<id>`, so a picked strip slides in, a removed one slides out and reordered strips move to their new places. Without support the fragment just swaps.
+- **The cast sequence.** Casting returns the storyboard with a `.bl-titles` overlay (`templates/partials.html`): bars in each film's field sweep across, the five titles roll and "That's a wrap" lands, about 2.8 s, all CSS animation (`static/ballot.css`). A small script in `templates/ballot.html` removes it on any click or key, or when its last animation ends.
+- **Reduced motion.** Under `prefers-reduced-motion: reduce`, `site.css` turns off every animation, transition and view-transition animation, and `ballot.css` hides the cast sequence entirely.

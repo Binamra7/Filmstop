@@ -96,7 +96,7 @@
 
 /* ---------- The reading, on paper */
 .five-page .f5-reading {
-  --field: var(--paper); --on: var(--ink); --on-2: #4a4038; --shape: var(--cut);
+  --field: var(--paper); --on: var(--ink); --on-2: var(--paper-ink-2); --shape: var(--cut);
   background: var(--field); color: var(--on); padding: 64px 0 80px;
 }
 .five-page .f5-reading-grid { display: grid; gap: 36px; }
