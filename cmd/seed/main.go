@@ -1,8 +1,11 @@
 // Command seed fills a local database with made-up ballots over a built-in
 // catalogue of real films, so every part of the site has something to show
 // during development. Never run it against production: the ballots are fake.
+// It refuses a Turso database (TURSO_DATABASE_URL) unless -remote is passed.
 //
-//	go run ./cmd/seed -db filmstop.db -voters 400
+//	go run ./cmd/seed -db filmstop.db -voters 400 -days 45
+//
+// Rerunning it replaces the previous run's crowd and resets every persona.
 //
 // It needs no network. With TMDB_API_KEY set it also fetches each film's real
 // details and still, so the pages have pictures.
@@ -154,6 +157,8 @@ func main() {
 // voter (or persona) id starts with it.
 const seedPrefix = "seed"
 
+// pickTribe draws a tribe weighted by share. The fallback covers shares whose
+// float sum lands just under 1.
 func pickTribe(r *rand.Rand) tribe {
 	u, sum := r.Float64(), 0.0
 	for _, t := range tribes {
@@ -194,6 +199,7 @@ func ballotFor(r *rand.Rand, t tribe) store.Ballot {
 	return b
 }
 
+// withnail is the TMDB id of Withnail & I, the cult tribe's number one.
 const withnail = 13446
 
 // castTime spreads ballots over the last days, busier lately, and puts the
@@ -207,6 +213,7 @@ func castTime(r *rand.Rand, v, n, days int, now time.Time) time.Time {
 	return now.Add(-time.Duration(math.Pow(r.Float64(), 1.8)*float64(span)) - 2*time.Hour)
 }
 
+// recent holds how long ago the last few ballots were cast, newest first.
 var recent = []time.Duration{20 * time.Second, 3 * time.Minute, 11 * time.Minute, 38 * time.Minute, 70 * time.Minute}
 
 // A persona is a voter you can browse as, set up to show one state of the site.

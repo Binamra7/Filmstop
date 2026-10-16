@@ -101,8 +101,9 @@ func (s *Server) filmNotFound(c *gin.Context) {
 	s.render(c, http.StatusNotFound, "notfound", page{"Not found · Filmstop", ""})
 }
 
-// fillDetails fetches a film's director, tagline and runtime on first view. A
-// slow or failed answer just leaves the page without them.
+// fillDetails fetches a film's TMDB details on first view, waiting at most
+// 2.5 s so a slow TMDB can't hold up the page. On failure the page goes out
+// without them.
 func (s *Server) fillDetails(c *gin.Context, m *store.Movie) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 2500*time.Millisecond)
 	defer cancel()

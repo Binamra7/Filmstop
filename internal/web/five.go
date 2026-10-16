@@ -185,6 +185,7 @@ type tasteRun struct {
 	Film bool
 }
 
+// String returns the paragraph as plain text, titles included.
 func (p tastePara) String() string {
 	var b strings.Builder
 	for _, r := range p {
