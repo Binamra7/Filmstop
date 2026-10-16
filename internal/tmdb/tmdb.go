@@ -123,7 +123,12 @@ func (c *Client) get(ctx context.Context, path string, v url.Values, out any) er
 	req.Header.Set("Accept", "application/json")
 	res, err := c.http.Do(req)
 	if err != nil {
-		return err
+		// A *url.Error quotes the full URL, which can carry the api_key.
+		var ue *url.Error
+		if errors.As(err, &ue) {
+			err = ue.Err
+		}
+		return fmt.Errorf("tmdb %s: %w", path, err)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {

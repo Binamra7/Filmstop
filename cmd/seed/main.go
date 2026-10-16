@@ -8,6 +8,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -29,7 +30,7 @@ type film struct {
 }
 
 func main() {
-	dbPath := flag.String("db", "filmstop.db", "SQLite file")
+	dbPath := flag.String("db", "filmstop.db", "SQLite file (ignored when TURSO_DATABASE_URL is set)")
 	voters := flag.Int("voters", 400, "simulated voters")
 	flag.Parse()
 	key := strings.TrimSpace(os.Getenv("TMDB_API_KEY"))
@@ -45,7 +46,7 @@ func main() {
 	if len(films) < rank.Slots {
 		log.Fatalf("TMDB returned %d films; a ballot needs %d", len(films), rank.Slots)
 	}
-	st, err := store.Open(*dbPath)
+	st, err := store.Open(store.Source(*dbPath))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,7 +99,12 @@ func topRated(key string, pages int) ([]film, error) {
 		}
 		res, err := http.DefaultClient.Do(req)
 		if err != nil {
-			return nil, err
+			// A *url.Error quotes the full URL, which can carry the api_key.
+			var ue *url.Error
+			if errors.As(err, &ue) {
+				err = ue.Err
+			}
+			return nil, fmt.Errorf("tmdb top_rated: %w", err)
 		}
 		if res.StatusCode != http.StatusOK {
 			res.Body.Close()
