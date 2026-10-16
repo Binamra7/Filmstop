@@ -1,0 +1,17 @@
+# Render Blueprint: the free web service runs the Dockerfile. Its disk is wiped
+# on every restart, so the database lives in Turso (see README).
+services:
+  - type: web
+    name: filmstop
+    runtime: docker
+    plan: free
+    region: singapore
+    branch: main
+    healthCheckPath: /healthz
+    envVars:
+      - key: TMDB_API_KEY
+        sync: false
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false

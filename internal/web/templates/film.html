@@ -1,0 +1,89 @@
+{{define "content"}}
+{{$f := .Film}}{{$s := .Standing}}
+<article class="fp">
+<section class="opening fp-hero" aria-labelledby="fp-title">
+  <div class="opening-still">
+    {{with $f.BackdropPath}}
+    <img src="{{poster . "w1280"}}" srcset="{{poster . "w780"}} 780w, {{poster . "w1280"}} 1280w, {{poster . "original"}} 1920w" sizes="100vw" width="1280" height="720" alt="" fetchpriority="high" decoding="async">
+    {{else}}{{with $f.PosterPath}}<img class="from-poster" src="{{poster . "w780"}}" width="780" height="1170" alt="" fetchpriority="high" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}
+  </div>
+  <div class="title-card">
+    <p class="kicker">{{if $s.Place}}No. {{$s.Place}} on Filmstop{{else if $s.Ballots}}Not on the list yet{{else}}Waiting for its first vote{{end}}</p>
+    <h1 id="fp-title" class="film-title">{{$f.Title}}</h1>
+    <p class="credit fp-credit">{{with $f.Director}}<span>{{.}}</span> · {{end}}<span>{{$f.Year}}</span>{{with runtime $f.Runtime}} · <span>{{.}}</span>{{end}}{{with $f.Genres}} · <span>{{.}}</span>{{end}}</p>
+    {{with $f.Tagline}}<p class="tagline">“{{.}}”</p>{{end}}
+  </div>
+</section>
+
+<div class="wrap fp-body">
+  <section class="fp-story" aria-labelledby="fp-story-head">
+    <h2 id="fp-story-head" class="fp-head">The story</h2>
+    {{with $f.Overview}}<p class="fp-overview">{{.}}</p>
+    {{else}}<p class="fp-overview muted">The film database has no synopsis for this one. Some films you just have to see.</p>{{end}}
+  </section>
+
+  <section class="fp-stand" aria-labelledby="fp-stand-head">
+    {{if $s.Place}}
+    <h2 id="fp-stand-head" class="fp-head">Where it stands</h2>
+    <p class="fp-line"><strong>{{num $s.Points}}</strong> {{plural $s.Points "point" "points"}} from {{num $s.Ballots}} of the {{num .Voters}} {{plural .Voters "ballot" "ballots"}} cast{{if $s.Firsts}}, {{num $s.Firsts}} of them with it first{{end}}.</p>
+    {{else if $s.Ballots}}
+    <h2 id="fp-stand-head" class="fp-head">Not on the list yet</h2>
+    <p class="fp-line">It’s on {{num $s.Ballots}} {{plural $s.Ballots "ballot" "ballots"}}, worth <strong>{{num $s.Points}}</strong> {{plural $s.Points "point" "points"}}.{{with .Short}} {{.}}{{end}}</p>
+    {{else}}
+    <h2 id="fp-stand-head" class="fp-head">No one has picked it yet</h2>
+    <p class="fp-line">Not a single ballot so far. Be the first, and it opens the list’s next chapter.</p>
+    {{end}}
+    {{with .Note}}<p class="fp-note">{{.}}</p>{{end}}
+    {{if $s.Ballots}}
+    <div class="spread fp-spread" role="img" aria-label="Where voters placed it: {{range $i, $n := $s.ByPos}}{{if $i}}, {{end}}{{$n}} at number {{add $i 1}}{{end}}">
+      {{range spread $s.ByPos}}
+      <div class="spread-col">
+        <span class="spread-bar"><span style="height: {{.Pct}}%"></span></span>
+        <span class="spread-label">#{{.Pos}} <b>{{.N}}</b></span>
+      </div>
+      {{end}}
+    </div>
+    {{end}}
+
+    <div class="fp-act">
+      {{if .Draft}}
+      <p>It’s in your five, at number {{.Draft}}.</p>
+      <a class="btn btn-primary" href="/ballot">Open your five</a>
+      {{else if .Full}}
+      <p>Your five is full. Make room, and this one can have a scene.</p>
+      <a class="btn btn-primary" href="/ballot">Open your five</a>
+      {{else}}
+      <form method="post" action="/ballot/pick">
+        <input type="hidden" name="id" value="{{$f.ID}}">
+        <button class="btn btn-primary">Add it to your five</button>
+      </form>
+      <p class="muted">It takes your next empty scene. You can reorder on your ballot.</p>
+      {{end}}
+    </div>
+  </section>
+</div>
+
+{{with .Also}}
+<section class="wrap fp-also" aria-labelledby="fp-also-head">
+  <div class="section-head">
+    <h2 id="fp-also-head" class="section-title">People who put this in their five also chose…</h2>
+  </div>
+  <ol class="fp-also-grid">
+    {{range .}}
+    <li>
+      <a class="fp-also-card" href="/film/{{.ID}}">
+        <span class="scene-still">
+          {{with .BackdropPath}}<img src="{{poster . "w780"}}" srcset="{{poster . "w300"}} 300w, {{poster . "w780"}} 780w" sizes="(min-width: 1100px) 30vw, (min-width: 600px) 46vw, 100vw" width="780" height="439" alt="" loading="lazy" decoding="async">
+          {{else}}{{with .PosterPath}}<img class="from-poster" src="{{poster . "w500"}}" width="500" height="750" alt="" loading="lazy" decoding="async">{{else}}{{template "blank-still"}}{{end}}{{end}}
+        </span>
+        <span class="fp-also-title film-title">{{.Title}}</span>
+        <span class="credit">{{with .Director}}{{.}} · {{end}}{{.Year}}</span>
+        <span class="fp-also-shared">Together on {{num .Shared}} {{plural .Shared "ballot" "ballots"}}</span>
+      </a>
+    </li>
+    {{end}}
+  </ol>
+</section>
+{{end}}
+</article>
+{{end}}

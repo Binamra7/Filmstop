@@ -1,0 +1,35 @@
+/* Film page: one film's own scene, its standing, and the company it keeps. */
+@media (min-width: 860px) {
+  body:has(.fp-hero) .top { margin-bottom: -84px; }
+  body:has(.fp-hero) .top nav a { text-shadow: 0 1px 12px rgb(0 0 0 / 0.6); }
+}
+.fp-credit span { white-space: nowrap; }
+
+.fp-body { display: grid; gap: 48px; padding-top: 40px; padding-bottom: 80px; }
+@media (min-width: 980px) {
+  .fp-body { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); column-gap: 80px; padding-top: 56px; }
+}
+.fp-head { font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 500; font-size: clamp(26px, 1.1rem + 1vw, 32px); line-height: 1.15; letter-spacing: -0.01em; }
+.fp-overview { margin-top: 16px; font-size: 19px; line-height: 1.65; max-width: 62ch; }
+
+.fp-stand { align-self: start; }
+.fp-line { margin-top: 14px; font-size: 18px; color: var(--text-2); }
+.fp-line strong { color: var(--text); font-weight: 650; }
+.fp-note { margin-top: 10px; color: var(--text); max-width: 46ch; }
+.fp-spread { margin-top: 24px; }
+.fp-act { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); display: grid; gap: 14px; justify-items: start; }
+.fp-act .muted { font-size: 15px; }
+@media (max-width: 599px) { .fp-act, .fp-act form, .fp-act .btn { width: 100%; } }
+
+.fp-also { padding-bottom: 96px; }
+.fp-also .section-title { max-width: 24ch; }
+.fp-also-grid { display: grid; gap: 36px 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+@media (max-width: 599px) { .fp-also-grid { grid-template-columns: 1fr 1fr; gap: 28px 14px; } }
+.fp-also-card { display: flex; flex-direction: column; text-decoration: none; }
+.fp-also-card .scene-still { display: block; }
+.fp-also-card .scene-still::after { display: none; }
+.fp-also-title { margin-top: 14px; font-size: clamp(20px, 1rem + 0.6vw, 24px); }
+.fp-also-card .credit { margin-top: 4px; font-size: 15px; }
+.fp-also-shared { margin-top: 6px; font-size: 15px; color: var(--text-2); }
+.fp-also-card:hover .fp-also-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
+@media (prefers-reduced-motion: no-preference) { .fp-also-card:hover .scene-still img { transform: scale(1.03); } }

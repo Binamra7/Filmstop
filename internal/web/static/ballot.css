@@ -1,0 +1,27 @@
+/* Ballot: company notes, the empty-search starter, the wrap. Loaded after site.css. */
+
+/* A picked film's title links to its page; the row's buttons stay separate. */
+.bl-title { color: var(--text); text-decoration: none; align-self: start; }
+.bl-title:hover { text-decoration: underline; text-decoration-color: var(--text-2); }
+.bl-note { margin-top: 4px; font-size: 14px; line-height: 1.4; color: var(--text-2); text-wrap: pretty; }
+.shot { align-items: start; }
+.shot-tools { align-self: center; }
+.shot-empty { align-items: center; }
+.bl-hint { text-wrap: pretty; }
+
+/* Empty search: something to think about, then the list's top five. */
+.bl-start { padding: 6px 4px 0; }
+.bl-start-head { font-size: 18px; font-weight: 650; }
+.bl-prompt {
+  margin-top: 10px; max-width: 30ch;
+  font-family: var(--serif); font-variation-settings: var(--serif-cut); font-weight: 500;
+  font-size: clamp(24px, 1rem + 1.2vw, 30px); line-height: 1.2; text-wrap: balance;
+}
+.bl-start-sub { margin-top: 10px; font-size: 16px; }
+.bl-start .hits { margin: 14px -4px 0; }
+
+/* That's a wrap */
+.bl-done-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+.bl-done-actions .btn { flex: 1 1 auto; }
+.bl-text-link { padding: 10px 2px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--line-strong); }
+.bl-text-link:hover { text-decoration-color: var(--text); }

@@ -1,0 +1,27 @@
+services:
+  web:
+    build: .
+    image: filmstop
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+    volumes:
+      - filmstop-data:/data
+    restart: unless-stopped
+
+  # Demo data only: simulated ballots over real TMDB films. The web service
+  # reads the board at startup, so seed first (or restart web afterwards):
+  #   docker compose run --rm seed && docker compose up -d
+  seed:
+    build: .
+    image: filmstop
+    profiles: [seed]
+    entrypoint: ["/seed", "-db", "/data/filmstop.db", "-voters", "400"]
+    environment:
+      TMDB_API_KEY: ${TMDB_API_KEY:-}
+    volumes:
+      - filmstop-data:/data
+
+volumes:
+  filmstop-data:
