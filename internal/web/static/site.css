@@ -7,6 +7,8 @@
   --paper: #f4ecdd;
   --paper-2: #a69f95;
   --cut: #e2321f;
+  --paper-ink-2: #55493f; /* secondary text on paper (7.42:1) */
+  --ink-raised: #221c17;  /* a row lifted off the black page on hover */
 
   /* The black page is itself a field, so components can read the same four
      variables everywhere. */
