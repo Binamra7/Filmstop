@@ -20,7 +20,7 @@ the number one as the opening scene, two to five as scene tiles, and the rest as
 
 <br />
 
-<img src="docs/screenshots/00-cover-phones.jpg" alt="Filmstop on three phones: The Shawshank Redemption at number one on an orange field, the half-filled Storyboard your five ballot, and a voter's five card led by In the Mood for Love on a red field" />
+<img src="docs/screenshots/00-opening-titles.gif" alt="The opening title sequences on the live site, one after another: bars sweep across and leave each film in its poster colour, then the title drops onto a paper strip. The Shawshank Redemption at number one in orange, Vertigo in red, Inception in teal and The Dark Knight in navy" />
 
 </div>
 
