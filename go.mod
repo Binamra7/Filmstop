@@ -5,7 +5,7 @@ go 1.26.9
 require (
 	github.com/gin-gonic/gin v1.12.0
 	github.com/tursodatabase/libsql-client-go v0.0.0-20260528064733-9d5d30a29a60
-	modernc.org/sqlite v1.62.0
+	modernc.org/sqlite v1.63.0
 )
 
 require (
